@@ -62,7 +62,7 @@ Train a bag-of-words MLP on Flickr30k VGG-16 features:
 
 To evaluate this model on Flickr30k on development data, run:
 
-    ./apply_bow_mlp.py models/train_bow_mlp/d64b725040 dev
+    ./apply_bow_mlp.py models/train_bow_mlp/dea2850778 dev
     ./eval_precision_recall.py --analyze --sigmoid_threshold 0.4 \
         models/train_bow_mlp/dea2850778 dev
 

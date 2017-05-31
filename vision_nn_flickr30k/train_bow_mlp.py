@@ -50,8 +50,32 @@ default_options_dict = {
     "detect_sigmoid_threshold": 0.5,
     "train_bow_type": "single",  # "single", "average", "top_k"
     "rnd_seed": 2,
-    "train_tag": "all_no8ktraintest",  # "train", "all_no8ktraintest"
+    "train_tag": "all_no8k",  # "train", "all_no8ktraintest", "all_no8k"
     }
+
+# # Interspeech 2017 training settings:
+# default_options_dict = {
+#     "data_dir": "data/flickr30k", # "data/temp", # 
+#     "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
+#     "model_dir": "models/train_bow_mlp",
+#     "n_max_epochs": 75,
+#     "batch_size": 64,
+#     "ff_keep_prob": 0.75,
+#     "n_most_common": 1000,
+#     "n_hiddens": [3072, 3072, 3072, 3072],
+#     # "optimizer": {
+#     #     "type": "sgd",
+#     #     "learning_rate": 0.001
+#     # },
+#     "optimizer": {
+#         "type": "adam",
+#         "learning_rate": 0.0001
+#     },
+#     "detect_sigmoid_threshold": 0.5,
+#     "train_bow_type": "single",  # "single", "average", "top_k"
+#     "rnd_seed": 2,
+#     "train_tag": "all_no8ktraintest",  # "train", "all_no8ktraintest", "all_no8k"
+#     }
 
 
 #-----------------------------------------------------------------------------#
@@ -87,7 +111,7 @@ def load_flickr30k_bow_labelled(data_dir, subset, label_dict, n_bow,
         number of captions; "top_k" keeps only the top k most common words.
     """
 
-    assert subset in ["train", "all_no8ktraintest", "dev", "test"]
+    assert subset in ["train", "all_no8ktraintest", "all_no8k", "dev", "test"]
 
     # Load data and shuffle
     npz_fn = path.join(data_dir, "fc7.npz")

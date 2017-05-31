@@ -40,7 +40,7 @@ default_options_dict = {
     # "speech_data_dir": "data/fbank_vad",
     "speech_label_dict": "data/captions_content_dict.pkl", 
     "visionsig_npz":
-        "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz",
+        "../vision_nn_flickr30k/models/train_bow_mlp/bc22ca83c9/sigmoid_output_dict.flickr8k.npz",
     "word_to_id_dict": "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl", 
     "model_dir": "models/train_visionspeech_cnn",
     "visionsig_threshold": None,  # if None, sigmoids are used as targets directly
@@ -74,6 +74,46 @@ default_options_dict = {
     "n_hiddens": [4096],
     "rnd_seed": 42,
     }
+# # Interspeech 2017 training settings:
+# default_options_dict = {
+#     "speech_data_dir": "data/mfcc_cmvn_dd_vad",
+#     # "speech_data_dir": "data/fbank_vad",
+#     "speech_label_dict": "data/captions_content_dict.pkl", 
+#     "visionsig_npz":
+#         "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz",
+#     "word_to_id_dict": "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl", 
+#     "model_dir": "models/train_visionspeech_cnn",
+#     "visionsig_threshold": None,  # if None, sigmoids are used as targets directly
+#     "n_most_common": 1000,  # needs to be less than the dimensionality of the
+#                             # vision sigmoids; if None, then the full vision
+#                             # dimensionality is used
+#     "n_max_epochs": 15,
+#     "batch_size": 16,
+#     "ff_keep_prob": 1.0,
+#     "center_padded": True,
+#     # "optimizer": {
+#     #     "type": "sgd",
+#     #     "learning_rate": 0.1
+#     # },
+#     "optimizer": {
+#         "type": "adam",
+#         "learning_rate": 0.0001,
+#     },
+#     "n_padded": 800,
+#     "filter_shapes": [
+#         [39, 9, 1, 64],
+#         [1, 10, 64, 256],
+#         [1, 11, 256, 1024]
+#     ],
+#     "pool_shapes": [
+#         [1, 3],
+#         [1, 3],
+#         [1, 75]
+#     ],
+#     "detect_sigmoid_threshold": 0.4,
+#     "n_hiddens": [4096],
+#     "rnd_seed": 42,
+#     }
 
 
 #-----------------------------------------------------------------------------#

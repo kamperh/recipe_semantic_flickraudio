@@ -232,3 +232,11 @@ On the test set, this model achieves the following scores, as in Table 1 of
     Recall: 4214 / 29617 = 14.2283%
     F-score: 13.1269%
     Average precision: 6.8280%
+
+
+Semantic keyword spotting
+-------------------------
+Evaluation here is based on the semantic keyword labels collected using
+Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`.
+
+    ./eval_semkeyword_spotting.py 
