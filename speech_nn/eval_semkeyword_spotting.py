@@ -64,6 +64,10 @@ def eval_semkeyword_exact_sem_counts(sigmoid_dict, word_to_id, keyword_counts,
 
     for i_keyword, keyword in enumerate(keywords):
 
+        # Rank
+        rank_order = keyword_sigmoid_mat[:, i_keyword].argsort()[::-1]
+        utt_order = [utterances[i] for i in rank_order]
+
 
     return
     
@@ -230,6 +234,8 @@ def main():
     print("Average EER: {:.4f}".format(eer))
     print("-"*79)
 
+    print eval_semkeyword_exact_sem_counts(sigmoid_output_dict_subset, word_to_id, semkeywords_counts,
+        exact_keywords_dict, semkeywords_dict)
 
 
 if __name__ == "__main__":
