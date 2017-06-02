@@ -237,6 +237,22 @@ On the test set, this model achieves the following scores, as in Table 1 of
 Semantic keyword spotting
 -------------------------
 Evaluation here is based on the semantic keyword labels collected using
-Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`.
+Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`. To
+do an evaluation of exact matches, run:
 
-    ./eval_semkeyword_spotting.py 
+    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.6.txt \
+        models/train_visionspeech_cnn/989f00f30a dev
+
+To run semantic and exact keyword spotting on the 1000 labelled test
+utterances, run:
+
+    ./eval_semkeyword_spotting.py models/train_visionspeech_cnn/989f00f30a
+
+
+Model notebook
+--------------
+- OracleSpeechCNN: models/train_bow_cnn/4f8af91591
+- VisionSpeechCNN trained using vision system which includes Flickr8k dev
+  images: models/train_visionspeech_cnn/989f00f30a
+- VisionSpeechCNN trained using vision system not overlapping with any Flickr8k
+  images: models/train_visionspeech_cnn/49b4c2e773

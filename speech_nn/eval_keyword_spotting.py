@@ -39,6 +39,10 @@ def check_argv():
         "--analyze", help="print an analysis of the evaluation output for each utterance",
         action="store_true"
         )
+    parser.add_argument(
+        "--keywords_fn", type=str, help="list of keywords to use (default: %(default)s)",
+        default=keywords_fn
+        )
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
@@ -112,10 +116,18 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, 
                 #     utt for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
                 #     ]
                 print "Incorrect in top 10:"
-                print "\n".join([
-                    "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                    + utt[4:] + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                    ])
+                if utt.count("_") == 3:
+                    print "\n".join([
+                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+                        + utt[4:] + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+                        ])
+                elif utt.count("_") == 2:
+                    print "\n".join([
+                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+                        + utt + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+                        ])
+                else:
+                    assert False
 
     if analyze:
         print "-"*79
@@ -166,8 +178,8 @@ def main():
     utterances = sorted(sigmoid_output_dict.keys())
 
     # Read keywords
-    print "Reading:", keywords_fn
-    with open(keywords_fn, "r") as f:
+    print "Reading:", args.keywords_fn
+    with open(args.keywords_fn, "r") as f:
         keywords = []
         for line in f:
             keywords.append(line.strip())
