@@ -16,6 +16,8 @@ import numpy as np
 import os
 import sys
 
+vision_npz = "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz"
+
 
 #-----------------------------------------------------------------------------#
 #                              UTILITY FUNCTIONS                              #
@@ -43,10 +45,6 @@ def main():
 
     n_most_common = 1000
     
-    output_dir = "models/temp"
-    if not path.isdir(output_dir):
-        os.mkdir(output_dir)
-
     word_to_id_dict_fn = "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl"
     print "Reading:", word_to_id_dict_fn
     with open(word_to_id_dict_fn, "rb") as f:
@@ -67,9 +65,12 @@ def main():
     subset_utterances = sorted(features_dict.keys())
     print "No. {} utterances: {}".format(args.subset, len(subset_utterances))
 
-    vision_npz = "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz"
     print "Reading:", vision_npz
     vision_features = np.load(vision_npz)
+
+    output_dir = "models/vision_nn_baseline_" + path.split(path.split(vision_npz)[0])[1]
+    if not path.isdir(output_dir):
+        os.mkdir(output_dir)
 
     # Loop over utterances and obtain vision features
     sigmoid_output_dict = {}

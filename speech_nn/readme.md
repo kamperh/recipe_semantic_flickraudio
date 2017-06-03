@@ -213,6 +213,21 @@ The `keywords_fn` variable at the start of `eval_keyword_spotting.py` are used
 to choose the set of keywords if you want to use a different keyword set.
 
 
+Semantic keyword spotting
+-------------------------
+Evaluation here is based on the semantic keyword labels collected using
+Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`. To
+do an evaluation of exact matches, run:
+
+    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.6.txt \
+        models/train_visionspeech_cnn/989f00f30a dev
+
+To run semantic and exact keyword spotting on the 1000 labelled test
+utterances, run:
+
+    ./eval_semkeyword_spotting.py models/train_visionspeech_cnn/989f00f30a
+
+
 Unigram baseline
 ----------------
 Get unigram baseline and evaluate:
@@ -234,19 +249,16 @@ On the test set, this model achieves the following scores, as in Table 1 of
     Average precision: 6.8280%
 
 
-Semantic keyword spotting
--------------------------
-Evaluation here is based on the semantic keyword labels collected using
-Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`. To
-do an evaluation of exact matches, run:
+Vision system baseline
+----------------------
+Every utterance is encoded as its visual BoW vector (so the five spoken
+captions will share the same output). Run:
 
-    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.6.txt \
-        models/train_visionspeech_cnn/989f00f30a dev
+    ./get_vision_baseline.py test
+    ./eval_semkeyword_spotting.py 
 
-To run semantic and exact keyword spotting on the 1000 labelled test
-utterances, run:
-
-    ./eval_semkeyword_spotting.py models/train_visionspeech_cnn/989f00f30a
+The `vision_npz` variable in the script can be changed to pick a specific
+vision model.
 
 
 Model notebook

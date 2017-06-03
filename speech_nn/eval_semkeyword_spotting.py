@@ -12,6 +12,7 @@ from collections import Counter
 from os import path
 import argparse
 import cPickle as pickle
+import numpy as np
 import sys
 
 from eval_keyword_spotting import eval_keyword_spotting
@@ -47,13 +48,13 @@ def check_argv():
 #                             EVALUATION FUNCTIONS                            #
 #-----------------------------------------------------------------------------#
 
-def eval_semkeyword_exact_sem_counts(sigmoid_dict, word_to_id, keyword_counts,
+def eval_semkeyword_exact_sem_counts(sigmoid_dict, word_to_id, keyword_list,
         exact_label_dict, sem_label_dict):
     """
-    Return a dict with elements `[n_total, n_exact, n_sem]` for each keyword.
+    Return a dict with elements `(n_total, n_exact, n_sem)` for each keyword.
     """
 
-    keywords = sorted(keyword_counts)
+    keywords = sorted(keyword_list)
     utterances = sorted(sigmoid_dict)
     keyword_ids = [word_to_id[w] for w in keywords]
 
@@ -62,90 +63,38 @@ def eval_semkeyword_exact_sem_counts(sigmoid_dict, word_to_id, keyword_counts,
     for i_utt, utt in enumerate(utterances):
         keyword_sigmoid_mat[i_utt, :] = sigmoid_dict[utt][keyword_ids]
 
+    precision_counts_dict = {}  # [n_total, n_exact, n_sem]
     for i_keyword, keyword in enumerate(keywords):
 
         # Rank
         rank_order = keyword_sigmoid_mat[:, i_keyword].argsort()[::-1]
         utt_order = [utterances[i] for i in rank_order]
 
-
-    return
-    
-    keywords = sorted(keyword_counts)
-    utterances = sorted(sigmoid_dict)
-    keyword_ids = [word_to_id[w] for w in keywords]
-
-    # Get sigmoid matrix for keywords
-    keyword_sigmoid_mat = np.zeros((len(utterances), len(keywords)))
-    for i_utt, utt in enumerate(utterances):
-        keyword_sigmoid_mat[i_utt, :] = sigmoid_dict[utt][keyword_ids]
-
-    # Keyword spotting evaluation
-    p_at_10 = []
-    p_at_n = []
-    eer = []
-    if analyze:
-        print
-    for i_keyword, keyword in enumerate(keywords):
-
-        # Rank
-        rank_order = keyword_sigmoid_mat[:, i_keyword].argsort()[::-1]
-        utt_order = [utterances[i] for i in rank_order]
-
-        # EER
         y_true = []
+        y_exact = []
+        y_sem = []
         for utt in utt_order:
-            if keyword in label_dict[utt]:
+            if keyword in sem_label_dict[utt]:
                 y_true.append(1)
             else:
                 y_true.append(0)
-        y_score = keyword_sigmoid_mat[:, i_keyword][rank_order]
-        cur_eer = calculate_eer(y_true, y_score)
-        eer.append(cur_eer)
+            if keyword in exact_label_dict[utt]:
+                y_exact.append(1)
+                y_sem.append(0)
+            elif keyword in sem_label_dict[utt]:
+                y_exact.append(0)
+                y_sem.append(1)
+            else:
+                y_exact.append(0)
+                y_sem.append(0)
 
-        # P@10
-        cur_p_at_10 = float(sum(y_true[:10]))/10.
-        p_at_10.append(cur_p_at_10)
+        n_total = sum(y_true)
+        n_exact = sum(y_exact[:sum(y_true)])
+        n_sem = sum(y_sem[:sum(y_true)])
 
-        # P@N
-        cur_p_at_n = float(sum(y_true[:keyword_counts[keyword]]))/keyword_counts[keyword]
-        p_at_n.append(cur_p_at_n)
+        precision_counts_dict[keyword] = (n_total, n_exact, n_sem)
 
-        if analyze:
-            print "-"*79
-            print "Keyword:", keyword
-            print "Current P@10: {:.4f}".format(cur_p_at_10)
-            print "Current P@N: {:.4f}".format(cur_p_at_n)
-            print "Current EER: {:.4f}".format(cur_eer)
-            print "Top 10 utterances: ", utt_order[:10]
-            if cur_p_at_10 != 1:
-                # print "Incorrect in top 10:", [
-                #     utt for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                #     ]
-                print "Incorrect in top 10:"
-                if utt.count("_") == 3:
-                    print "\n".join([
-                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                        + utt[4:] + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                        ])
-                elif utt.count("_") == 2:
-                    print "\n".join([
-                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                        + utt + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                        ])
-                else:
-                    assert False
-
-    if analyze:
-        print "-"*79
-        print
-
-    # Average
-    p_at_10 = np.mean(p_at_10)
-    p_at_n = np.mean(p_at_n)
-    eer = np.mean(eer)
-
-    return p_at_10, p_at_n, eer
+    return precision_counts_dict
 
 
 #-----------------------------------------------------------------------------#
@@ -218,7 +167,7 @@ def main():
     print("Average P@10: {:.4f}".format(p_at_10))
     print("Average P@N: {:.4f}".format(p_at_n))
     print("Average EER: {:.4f}".format(eer))
-    print("-"*79)
+    # print("-"*79)
 
     # print
     # print("Performing semantic keyword spotting evaluation")
@@ -226,7 +175,7 @@ def main():
         sigmoid_output_dict_subset, word_to_id, semkeywords_counts, semkeywords_dict, args.analyze
         )
 
-    print
+    # print
     print("-"*79)
     print("Semantic keyword spotting:")
     print("Average P@10: {:.4f}".format(p_at_10))
@@ -234,8 +183,29 @@ def main():
     print("Average EER: {:.4f}".format(eer))
     print("-"*79)
 
-    print eval_semkeyword_exact_sem_counts(sigmoid_output_dict_subset, word_to_id, semkeywords_counts,
-        exact_keywords_dict, semkeywords_dict)
+    keyword_precision_counts = eval_semkeyword_exact_sem_counts(
+        sigmoid_output_dict_subset, word_to_id, keywords, exact_keywords_dict,
+        semkeywords_dict
+        )
+    p_at_n_accum = 0
+    n_total_accum = 0
+    n_exact_accum = 0
+    n_sem_accum = 0
+    # print
+    for keyword in sorted(keyword_precision_counts):
+        (n_total, n_exact, n_sem) = keyword_precision_counts[keyword] 
+        # print("{}: {} exact and {} semantic out of {}".format(keyword, n_exact, n_sem, n_total))
+        p_at_n_accum += float(n_exact + n_sem) / n_total
+        n_total_accum += n_total
+        n_exact_accum += n_exact
+        n_sem_accum += n_sem
+    print "Breakdown of exact and semantic matches"
+    print("Average P@N:           {:.4f}".format(p_at_n_accum / len(keyword_precision_counts)))
+    print("Average* P@N overall:  {:.4f}".format(float(n_exact_accum + n_sem_accum) / n_total_accum))
+    print("Average* P@N exact:    {:.4f}".format(float(n_exact_accum ) / n_total_accum))
+    print("Average* P@N semantic: {:.4f}".format(float(n_sem_accum) / n_total_accum))
+    print("-"*79)
+
 
 
 if __name__ == "__main__":

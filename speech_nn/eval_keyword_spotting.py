@@ -101,7 +101,7 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, 
         p_at_10.append(cur_p_at_10)
 
         # P@N
-        cur_p_at_n = float(sum(y_true[:keyword_counts[keyword]]))/keyword_counts[keyword]
+        cur_p_at_n = float(sum(y_true[:sum(y_true)]))/sum(y_true)
         p_at_n.append(cur_p_at_n)
 
         if analyze:
