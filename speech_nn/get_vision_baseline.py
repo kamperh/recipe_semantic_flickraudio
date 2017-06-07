@@ -16,7 +16,9 @@ import numpy as np
 import os
 import sys
 
-vision_npz = "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz"
+# vision_npz = "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz"
+# vision_npz = "../vision_nn_mscoco/models/train_bow_mlp/c4e6b8d7a7/sigmoid_output_dict.flickr8k.npz"
+
 
 
 #-----------------------------------------------------------------------------#
@@ -26,6 +28,8 @@ vision_npz = "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_out
 def check_argv():
     """Check the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.strip().split("\n")[0], add_help=False)
+    parser.add_argument("sigmoid_npz", type=str, help="Numpy archive with sigmoid activations")
+    parser.add_argument("word_to_id_pkl", type=str, help="pickled dictionary giving ID to word mapping")
     parser.add_argument(
         "subset", type=str, help="subset to get the baseline for", choices=["dev", "test"]
         )
@@ -45,7 +49,9 @@ def main():
 
     n_most_common = 1000
     
-    word_to_id_dict_fn = "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl"
+    # word_to_id_dict_fn = "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl"
+    # word_to_id_dict_fn = "../vision_nn_mscoco/data/mscoco/word_to_id_content.pkl"
+    word_to_id_dict_fn = args.word_to_id_pkl
     print "Reading:", word_to_id_dict_fn
     with open(word_to_id_dict_fn, "rb") as f:
         word_to_id = pickle.load(f)
@@ -65,6 +71,7 @@ def main():
     subset_utterances = sorted(features_dict.keys())
     print "No. {} utterances: {}".format(args.subset, len(subset_utterances))
 
+    vision_npz = args.sigmoid_npz
     print "Reading:", vision_npz
     vision_features = np.load(vision_npz)
 

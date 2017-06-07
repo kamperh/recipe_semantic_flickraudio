@@ -21,7 +21,8 @@ import numpy as np
 import sklearn.metrics as metrics
 import sys
 
-keywords_fn = path.join("..", "data", "keywords.4.txt")
+# keywords_fn = path.join("..", "data", "keywords.4.txt")  # Interspeech 2017
+keywords_fn = path.join("..", "data", "keywords.6.txt")  # Interspeech 2017
 
 
 #-----------------------------------------------------------------------------#
@@ -119,7 +120,8 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, 
                 if utt.count("_") == 3:
                     print "\n".join([
                         "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                        + utt[4:] + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+                        + utt[4:] + ".wav {}".format(label_dict[utt]) for i,
+                        utt in enumerate(utt_order[:10]) if y_true[i] == 0
                         ])
                 elif utt.count("_") == 2:
                     print "\n".join([
@@ -169,6 +171,7 @@ def main():
     print "Reading:", label_dict
     with open(label_dict, "rb") as f:
         true_dict = pickle.load(f)
+
 
     # Read sigmoid output
     sigmoid_output_dict_fn = path.join(args.model_dir, "sigmoid_output_dict." + args.subset + ".pkl")

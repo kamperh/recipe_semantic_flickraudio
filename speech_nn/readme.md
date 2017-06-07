@@ -254,8 +254,20 @@ Vision system baseline
 Every utterance is encoded as its visual BoW vector (so the five spoken
 captions will share the same output). Run:
 
-    ./get_vision_baseline.py test
-    ./eval_semkeyword_spotting.py 
+    # Flickr30k
+    ./get_vision_baseline.py \
+        ../vision_nn_flickr30k/models/train_bow_mlp/bc22ca83c9/sigmoid_output_dict.flickr8k.npz \
+        ../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl \
+        dev
+    ./eval_precision_recall.py models/vision_nn_baseline_bc22ca83c9 dev
+    ./eval_semkeyword_spotting.py models/vision_nn_baseline_bc22ca83c9 dev
+
+    # MSCOCO
+    ./get_vision_baseline.py \
+        ../vision_nn_mscoco/models/train_bow_mlp/c4e6b8d7a7/sigmoid_output_dict.flickr8k.npz \
+        ../vision_nn_mscoco/data/mscoco/word_to_id_content.pkl \
+        dev
+    ./eval_precision_recall.py models/vision_nn_baseline_c4e6b8d7a7 dev
 
 The `vision_npz` variable in the script can be changed to pick a specific
 vision model.
@@ -265,6 +277,6 @@ Model notebook
 --------------
 - OracleSpeechCNN: models/train_bow_cnn/4f8af91591
 - VisionSpeechCNN trained using vision system which includes Flickr8k dev
-  images: models/train_visionspeech_cnn/989f00f30a
+  images (dea2850778): models/train_visionspeech_cnn/989f00f30a
 - VisionSpeechCNN trained using vision system not overlapping with any Flickr8k
-  images: models/train_visionspeech_cnn/49b4c2e773
+  images (bc22ca83c9): models/train_visionspeech_cnn/49b4c2e773

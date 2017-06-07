@@ -22,7 +22,7 @@ import vgg16
 
 TF_DTYPE = tf.float32
 TF_ITYPE = tf.int32
-weights_fn = path.join("data", "vgg16_weights.npz")
+weights_fn = path.join(os.path.dirname(__file__), "data", "vgg16_weights.npz")
 
 
 #-----------------------------------------------------------------------------#

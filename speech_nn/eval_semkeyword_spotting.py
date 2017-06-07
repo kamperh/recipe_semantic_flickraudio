@@ -15,6 +15,7 @@ import cPickle as pickle
 import numpy as np
 import sys
 
+
 from eval_keyword_spotting import eval_keyword_spotting
 
 keywords_fn = path.join("..", "data", "keywords.6.txt")
@@ -201,9 +202,9 @@ def main():
         n_sem_accum += n_sem
     print "Breakdown of exact and semantic matches"
     print("Average P@N:           {:.4f}".format(p_at_n_accum / len(keyword_precision_counts)))
-    print("Average* P@N overall:  {:.4f}".format(float(n_exact_accum + n_sem_accum) / n_total_accum))
-    print("Average* P@N exact:    {:.4f}".format(float(n_exact_accum ) / n_total_accum))
-    print("Average* P@N semantic: {:.4f}".format(float(n_sem_accum) / n_total_accum))
+    print("Average P@N* overall:  {:.4f}".format(float(n_exact_accum + n_sem_accum) / n_total_accum))
+    print("Average P@N* exact:    {:.4f}".format(float(n_exact_accum ) / n_total_accum))
+    print("Average P@N* semantic: {:.4f}".format(float(n_sem_accum) / n_total_accum))
     print("-"*79)
 
 
