@@ -21,7 +21,8 @@ import numpy as np
 import sklearn.metrics as metrics
 import sys
 
-keywords_fn = path.join("..", "data", "keywords.4.txt")
+# keywords_fn = path.join("..", "data", "keywords.4.txt")  # Interspeech 2017
+keywords_fn = path.join("..", "data", "keywords.6.txt")  # Interspeech 2017
 
 
 #-----------------------------------------------------------------------------#
@@ -38,6 +39,10 @@ def check_argv():
     parser.add_argument(
         "--analyze", help="print an analysis of the evaluation output for each utterance",
         action="store_true"
+        )
+    parser.add_argument(
+        "--keywords_fn", type=str, help="list of keywords to use (default: %(default)s)",
+        default=keywords_fn
         )
     if len(sys.argv) == 1:
         parser.print_help()
@@ -97,7 +102,7 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, 
         p_at_10.append(cur_p_at_10)
 
         # P@N
-        cur_p_at_n = float(sum(y_true[:keyword_counts[keyword]]))/keyword_counts[keyword]
+        cur_p_at_n = float(sum(y_true[:sum(y_true)]))/sum(y_true)
         p_at_n.append(cur_p_at_n)
 
         if analyze:
@@ -112,10 +117,19 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, 
                 #     utt for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
                 #     ]
                 print "Incorrect in top 10:"
-                print "\n".join([
-                    "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                    + utt[4:] + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                    ])
+                if utt.count("_") == 3:
+                    print "\n".join([
+                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+                        + utt[4:] + ".wav {}".format(label_dict[utt]) for i,
+                        utt in enumerate(utt_order[:10]) if y_true[i] == 0
+                        ])
+                elif utt.count("_") == 2:
+                    print "\n".join([
+                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+                        + utt + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+                        ])
+                else:
+                    assert False
 
     if analyze:
         print "-"*79
@@ -158,6 +172,7 @@ def main():
     with open(label_dict, "rb") as f:
         true_dict = pickle.load(f)
 
+
     # Read sigmoid output
     sigmoid_output_dict_fn = path.join(args.model_dir, "sigmoid_output_dict." + args.subset + ".pkl")
     print "Reading:", sigmoid_output_dict_fn
@@ -166,8 +181,8 @@ def main():
     utterances = sorted(sigmoid_output_dict.keys())
 
     # Read keywords
-    print "Reading:", keywords_fn
-    with open(keywords_fn, "r") as f:
+    print "Reading:", args.keywords_fn
+    with open(args.keywords_fn, "r") as f:
         keywords = []
         for line in f:
             keywords.append(line.strip())

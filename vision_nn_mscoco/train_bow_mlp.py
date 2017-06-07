@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Train a bag-of-words MLP on top of Flickr30k VGG16 features.
+Train a bag-of-words MLP on top of MSCOCO VGG16 features.
 
 Author: Herman Kamper
 Contact: kamperh@gmail.com
@@ -31,12 +31,12 @@ from tflego.blocks import TF_DTYPE, TF_ITYPE, NP_DTYPE
 #-----------------------------------------------------------------------------#
 
 default_options_dict = {
-    "data_dir": "data/flickr30k", # "data/temp", # 
+    "data_dir": "data/mscoco+flickr30k", # "data/mscoco", # "data/temp", # 
     "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
     "model_dir": "models/train_bow_mlp",
-    "n_max_epochs": 75,
-    "batch_size": 64,
-    "ff_keep_prob": 0.75,
+    "n_max_epochs": 25,  # 75
+    "batch_size": 256,  # 256
+    "ff_keep_prob": 0.75, # 0.75,
     "n_most_common": 1000,
     "n_hiddens": [3072, 3072, 3072, 3072],
     # "optimizer": {
@@ -49,33 +49,9 @@ default_options_dict = {
     },
     "detect_sigmoid_threshold": 0.5,
     "train_bow_type": "single",  # "single", "average", "top_k"
-    "rnd_seed": 2,
-    "train_tag": "train",  # "train", "all_no8ktraintest", "all_no8k"
+    "rnd_seed": 0,
+    "early_stopping": True,
     }
-
-# # Interspeech 2017 training settings:
-# default_options_dict = {
-#     "data_dir": "data/flickr30k", # "data/temp", # 
-#     "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
-#     "model_dir": "models/train_bow_mlp",
-#     "n_max_epochs": 75,
-#     "batch_size": 64,
-#     "ff_keep_prob": 0.75,
-#     "n_most_common": 1000,
-#     "n_hiddens": [3072, 3072, 3072, 3072],
-#     # "optimizer": {
-#     #     "type": "sgd",
-#     #     "learning_rate": 0.001
-#     # },
-#     "optimizer": {
-#         "type": "adam",
-#         "learning_rate": 0.0001
-#     },
-#     "detect_sigmoid_threshold": 0.5,
-#     "train_bow_type": "single",  # "single", "average", "top_k"
-#     "rnd_seed": 2,
-#     "train_tag": "all_no8ktraintest",  # "train", "all_no8ktraintest", "all_no8k"
-#     }
 
 
 #-----------------------------------------------------------------------------#
@@ -91,16 +67,13 @@ def check_argv():
         "and where previous models would be searched for",
         default=None
         )
-    # if len(sys.argv) == 1:
-    #     parser.print_help()
-    #     sys.exit(1)
     return parser.parse_args()
 
 
-def load_flickr30k_bow_labelled(data_dir, subset, label_dict, n_bow, 
+def load_mscoco_bow_labelled(data_dir, subset, label_dict, n_bow, 
         bow_type="single"):
     """
-    Return the Flickr30k image matrices and bag-of-word label vectors.
+    Return the MSCOCO image matrices and bag-of-word label vectors.
 
     Parameters
     ----------
@@ -111,13 +84,13 @@ def load_flickr30k_bow_labelled(data_dir, subset, label_dict, n_bow,
         number of captions; "top_k" keeps only the top k most common words.
     """
 
-    assert subset in ["train", "all_no8ktraintest", "all_no8k", "dev", "test"]
+    assert subset in ["train", "val"]
 
     # Load data and shuffle
-    npz_fn = path.join(data_dir, "fc7.npz")
+    npz_fn = path.join(data_dir, subset, "fc7.npz")
     print "Reading:", npz_fn
     features_dict = np.load(npz_fn)
-    subset_fn = path.join("..", "data", "flickr30k_" + subset + ".txt")
+    subset_fn = path.join(data_dir, subset + ".txt")
     print "Reading:", subset_fn
     image_keys = []
     with open(subset_fn, "r") as f:
@@ -165,64 +138,7 @@ def load_flickr30k_bow_labelled(data_dir, subset, label_dict, n_bow,
     else:
         assert False
 
-    # # Temp
-    # word_to_id_fn = path.join(data_dir, "word_to_id_content.pkl")
-    # print "Reading:", word_to_id_fn
-    # with open(word_to_id_fn, "rb") as f:
-    #     word_to_id = pickle.load(f)
-    # id_to_word = dict([(i[1], i[0]) for i in word_to_id.iteritems()])
-    # for i_data in xrange(len(image_keys)):
-    #     print image_keys[i_data]
-    #     print bow_vectors[i_data]
-    #     print [id_to_word[i] for i in np.where(bow_vectors[i_data, :])[0]]
-    #     assert False
-
     return x, bow_vectors
-
-# def load_flickr30k_bow_labelled(data_dir, subset, label_dict, n_bow):
-#     """Return the Flickr30k image matrices and bag-of-word label vectors."""
-
-#     assert subset in ["train", "dev", "test"]
-
-#     # Load data
-#     npz_fn = path.join(data_dir, "fc7.npz")
-#     print "Reading:", npz_fn
-#     features_dict = np.load(npz_fn)
-#     subset_fn = path.join(data_dir, subset + ".txt")
-#     print "Reading:", subset_fn
-#     image_keys = []
-#     with open(subset_fn, "r") as f:
-#         for line in f:
-#             image_keys.append(line.strip())
-
-#     # Bag-of-word vectors
-#     print datetime.now()
-#     print "Getting bag-of-word vectors"
-#     x = []
-#     bow_vectors = []
-#     for image_key in image_keys:
-#         for i_caption in xrange(5):
-#             label_key = "{}_{}".format(image_key, i_caption)
-#             if not label_key in label_dict:
-#                 print "Warning: Missing label " + label_key
-#             else:
-#                 bow_vector = np.zeros(n_bow, dtype=NP_DTYPE)
-#                 for i_word in label_dict[label_key]:
-#                     bow_vector[i_word] = 1
-#                 x.append(features_dict[image_key])
-#                 bow_vectors.append(bow_vector)
-
-#     # Shuffle
-#     print "Suffling data"
-#     shuffle_indices = range(len(x))
-#     random.shuffle(shuffle_indices)
-#     x_shuffle = []
-#     bow_vectors_shuffle = []
-#     for i_data in shuffle_indices:
-#         x_shuffle.append(x[i_data])
-#         bow_vectors_shuffle.append(bow_vectors[i_data])
-
-#     return np.array(x_shuffle, dtype=NP_DTYPE), np.array(bow_vectors, dtype=NP_DTYPE)
 
 
 #-----------------------------------------------------------------------------#
@@ -274,6 +190,10 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
     # Model filename
     n_epochs_post_complete = epoch_offset + options_dict["n_max_epochs"]
     model_fn = path.join(model_dir, "model.n_epochs_{}.ckpt".format(n_epochs_post_complete))
+    if options_dict["early_stopping"]:
+        best_model_fn = path.join(model_dir, "model.best_val.ckpt")
+    else:
+        best_model_fn = None
 
     # Random seeds
     random.seed(options_dict["rnd_seed"])
@@ -295,12 +215,12 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
         label_dict[image_key] = [i for i in label_dict[image_key] if i < options_dict["n_most_common"]]
 
     # Load image data
-    train_x, train_y_bow = load_flickr30k_bow_labelled(
-        options_dict["data_dir"], options_dict["train_tag"], label_dict,
+    train_x, train_y_bow = load_mscoco_bow_labelled(
+        options_dict["data_dir"], "train", label_dict,
         options_dict["n_most_common"], bow_type=options_dict["train_bow_type"]
         )
-    dev_x, dev_y_bow = load_flickr30k_bow_labelled(
-        options_dict["data_dir"], "dev", label_dict, options_dict["n_most_common"]
+    dev_x, dev_y_bow = load_mscoco_bow_labelled(
+        options_dict["data_dir"], "val", label_dict, options_dict["n_most_common"]
         )
     print "Train items shape:", train_x.shape
     print "Dev items shape:", dev_x.shape
@@ -386,9 +306,10 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
     print "Training bag-of-words MLP"
     record_dict = training.train_fixed_epochs(
         options_dict["n_max_epochs"], optimizer, loss, train_batch_iterator,
-        [x, y, keep_prob], [loss, precision, recall, fscore],
+        [x, y, keep_prob], [loss, precision, recall, -fscore],
         val_batch_iterator, load_model_fn=load_model_fn,
-        save_model_fn=model_fn, config=config, epoch_offset=epoch_offset
+        save_model_fn=model_fn, config=config, epoch_offset=epoch_offset,
+        save_best_val_model_fn=best_model_fn
         )
 
     # Save record
@@ -399,7 +320,6 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
 
     # Save options_dict
     options_dict["n_epochs_complete"] = n_epochs_post_complete
-    # options_dict_fn = path.join(model_dir, "options_dict.pkl")
     print("Writing: " + options_dict_fn)
     with open(options_dict_fn, "wb") as f:
         pickle.dump(options_dict, f, -1)

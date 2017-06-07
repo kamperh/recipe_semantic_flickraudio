@@ -213,6 +213,21 @@ The `keywords_fn` variable at the start of `eval_keyword_spotting.py` are used
 to choose the set of keywords if you want to use a different keyword set.
 
 
+Semantic keyword spotting
+-------------------------
+Evaluation here is based on the semantic keyword labels collected using
+Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`. To
+do an evaluation of exact matches, run:
+
+    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.6.txt \
+        models/train_visionspeech_cnn/989f00f30a dev
+
+To run semantic and exact keyword spotting on the 1000 labelled test
+utterances, run:
+
+    ./eval_semkeyword_spotting.py models/train_visionspeech_cnn/989f00f30a
+
+
 Unigram baseline
 ----------------
 Get unigram baseline and evaluate:
@@ -232,3 +247,36 @@ On the test set, this model achieves the following scores, as in Table 1 of
     Recall: 4214 / 29617 = 14.2283%
     F-score: 13.1269%
     Average precision: 6.8280%
+
+
+Vision system baseline
+----------------------
+Every utterance is encoded as its visual BoW vector (so the five spoken
+captions will share the same output). Run:
+
+    # Flickr30k
+    ./get_vision_baseline.py \
+        ../vision_nn_flickr30k/models/train_bow_mlp/bc22ca83c9/sigmoid_output_dict.flickr8k.npz \
+        ../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl \
+        dev
+    ./eval_precision_recall.py models/vision_nn_baseline_bc22ca83c9 dev
+    ./eval_semkeyword_spotting.py models/vision_nn_baseline_bc22ca83c9 dev
+
+    # MSCOCO
+    ./get_vision_baseline.py \
+        ../vision_nn_mscoco/models/train_bow_mlp/c4e6b8d7a7/sigmoid_output_dict.flickr8k.npz \
+        ../vision_nn_mscoco/data/mscoco/word_to_id_content.pkl \
+        dev
+    ./eval_precision_recall.py models/vision_nn_baseline_c4e6b8d7a7 dev
+
+The `vision_npz` variable in the script can be changed to pick a specific
+vision model.
+
+
+Model notebook
+--------------
+- OracleSpeechCNN: models/train_bow_cnn/4f8af91591
+- VisionSpeechCNN trained using vision system which includes Flickr8k dev
+  images (dea2850778): models/train_visionspeech_cnn/989f00f30a
+- VisionSpeechCNN trained using vision system not overlapping with any Flickr8k
+  images (bc22ca83c9): models/train_visionspeech_cnn/49b4c2e773
