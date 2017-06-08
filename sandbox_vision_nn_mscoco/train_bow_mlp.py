@@ -31,10 +31,10 @@ from tflego.blocks import TF_DTYPE, TF_ITYPE, NP_DTYPE
 #-----------------------------------------------------------------------------#
 
 default_options_dict = {
-    "data_dir": "data/mscoco", # "data/mscoco", # "data/temp", # 
+    "data_dir": "data/mscoco+flickr30k", #, "data/mscoco", #  "data/temp", # 
     "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
     "model_dir": "models/train_bow_mlp",
-    "n_max_epochs": 75,  # 75
+    "n_max_epochs": 150,  # 75
     "batch_size": 256,  # 256
     "ff_keep_prob": 0.75, # 0.75,
     "n_most_common": 1000,
@@ -50,7 +50,7 @@ default_options_dict = {
     "detect_sigmoid_threshold": 0.5,
     "train_bow_type": "single",  # "single", "average", "top_k"
     "rnd_seed": 0,
-    "early_stopping": True,
+    "early_stopping": False, # "early_stopping": True,
     }
 
 

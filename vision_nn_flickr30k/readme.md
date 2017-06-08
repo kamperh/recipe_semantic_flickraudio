@@ -49,7 +49,7 @@ Apply VGG-16 to all the Flickr30k images:
 Apply VGG-16 to all the Flickr8k images:
 
     mkdir data/flickr8k/
-    ./apply_vgg16.py --output_layer fc7 --batch_size 93 \
+    ./apply_vgg16.py --output_layer fc7 --batch_size 31 \
         /share/data/lang/users/kamperh/flickr_multimod/Flickr8k_Dataset/Flicker8k_Dataset/ \
         data/flickr8k/fc7.npz
 

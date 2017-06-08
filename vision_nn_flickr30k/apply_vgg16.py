@@ -39,18 +39,30 @@ def check_argv():
         choices=["fc7", "prob"], default="fc7"
         )
     parser.add_argument("--batch_size", type=int, help="batch size (default: %(default)s)", default=1)
+    parser.add_argument(
+        "--crop", help="if specified, images are cropped before scaling", action="store_true"
+        )
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
     return parser.parse_args()
 
 
-def images_from_dir(directory, extension="jpg"):
+def images_from_dir(directory, extension="jpg", crop=False):
     images_dict = {}
     for image_fn in sorted(glob.glob(path.join(directory, "*." + extension))):
         image = imread(image_fn, mode="RGB")
+        if crop:
+            short_edge = min(image.shape[:2])
+            yy = int((image.shape[0] - short_edge) / 2)
+            xx = int((image.shape[1] - short_edge) / 2)
+            image = image[yy: yy + short_edge, xx: xx + short_edge]            
         image = imresize(image, (224, 224))
         images_dict[path.splitext(path.split(image_fn)[-1])[0]] = image
+        # import matplotlib.pyplot as plt
+        # plt.imshow(image)
+        # plt.show()
+        # assert False
     return images_dict
 
 
@@ -71,7 +83,7 @@ def main():
     # Data
     print datetime.now()
     print "Reading directory:", args.input_dir
-    images_dict = images_from_dir(args.input_dir)
+    images_dict = images_from_dir(args.input_dir, crop=args.crop)
     image_keys = sorted(images_dict.keys())
     print datetime.now()
     print "No. images:", len(images_dict)

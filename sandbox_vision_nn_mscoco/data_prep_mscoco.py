@@ -56,9 +56,6 @@ def main():
 
     print(datetime.now())
 
-    if not path.isdir(path.join("data", "mscoco")):
-        os.makedirs(path.join("data", "mscoco"))
-
     # Obtain captions and URLs
     captions_json_fn = path.join(mscoco_annotations_dir, "captions_val2014.json")
     print("Reading: " + captions_json_fn)
