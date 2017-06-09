@@ -22,7 +22,7 @@ import sklearn.metrics as metrics
 import sys
 
 # keywords_fn = path.join("..", "data", "keywords.4.txt")  # Interspeech 2017
-keywords_fn = path.join("..", "data", "keywords.6.txt")  # Interspeech 2017
+keywords_fn = path.join("..", "data", "keywords.6.txt")
 
 
 #-----------------------------------------------------------------------------#

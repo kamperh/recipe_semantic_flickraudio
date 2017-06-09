@@ -34,11 +34,11 @@ default_options_dict = {
     "data_dir": "data/mscoco+flickr30k", #, "data/mscoco", #  "data/temp", # 
     "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
     "model_dir": "models/train_bow_mlp",
-    "n_max_epochs": 150,  # 75
+    "n_max_epochs": 100,  # 75
     "batch_size": 256,  # 256
-    "ff_keep_prob": 0.75, # 0.75,
+    "ff_keep_prob": 1.0, # 0.75, # 0.75,
     "n_most_common": 1000,
-    "n_hiddens": [3072, 3072, 3072, 3072],
+    "n_hiddens": [1024],  #, "n_hiddens": [3072, 3072, 3072, 3072],
     # "optimizer": {
     #     "type": "sgd",
     #     "learning_rate": 0.001
@@ -50,7 +50,7 @@ default_options_dict = {
     "detect_sigmoid_threshold": 0.5,
     "train_bow_type": "single",  # "single", "average", "top_k"
     "rnd_seed": 0,
-    "early_stopping": False, # "early_stopping": True,
+    "early_stopping": True,
     }
 
 

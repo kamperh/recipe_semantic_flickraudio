@@ -83,7 +83,7 @@ predictions, run:
 
     ./apply_bow_mlp.py --batch_size 93 models/train_bow_mlp/dea2850778 flickr8k
     ./show_predictions.py --sigmoid_threshold 0.7 \
-        models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz \
+        models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.all.npz \
         data/flickr30k/word_to_id_content.pkl
 
 This shows some of the system outputs, e.g.:
