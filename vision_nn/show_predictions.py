@@ -8,6 +8,7 @@ Contact: kamperh@gmail.com
 Date: 2017
 """
 
+from os import path
 import argparse
 import cPickle as pickle
 import numpy as np
@@ -22,7 +23,6 @@ def check_argv():
     """Check the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.strip().split("\n")[0], add_help=False)
     parser.add_argument("sigmoid_npz", type=str, help="Numpy archive with sigmoid activations")
-    parser.add_argument("word_to_id_pkl", type=str, help="pickled dictionary giving ID to word mapping")
     parser.add_argument(
         "--sigmoid_threshold", type=float,
         help="threshold for sigmoid output (default: %(default)s)", default=0.5
@@ -43,8 +43,9 @@ def main():
     print "Reading:", args.sigmoid_npz
     sigmoid_dict = dict(np.load(args.sigmoid_npz))
 
-    print "Reading:", args.word_to_id_pkl
-    with open(args.word_to_id_pkl, "rb") as f:
+    word_to_id_pkl = path.join(path.split(args.sigmoid_npz)[0], "word_to_id.pkl")
+    print "Reading:", word_to_id_pkl
+    with open(word_to_id_pkl, "rb") as f:
         word_to_id = pickle.load(f)
     id_to_word = dict([(i[1], i[0]) for i in word_to_id.iteritems()])    
 

@@ -49,7 +49,7 @@ Apply VGG-16 to all the Flickr30k images:
 Apply VGG-16 to all the Flickr8k images:
 
     mkdir data/flickr8k/
-    ./apply_vgg16.py --output_layer fc7 --batch_size 93 \
+    ./apply_vgg16.py --output_layer fc7 --batch_size 31 \
         /share/data/lang/users/kamperh/flickr_multimod/Flickr8k_Dataset/Flicker8k_Dataset/ \
         data/flickr8k/fc7.npz
 
@@ -83,7 +83,7 @@ predictions, run:
 
     ./apply_bow_mlp.py --batch_size 93 models/train_bow_mlp/dea2850778 flickr8k
     ./show_predictions.py --sigmoid_threshold 0.7 \
-        models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz \
+        models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.all.npz \
         data/flickr30k/word_to_id_content.pkl
 
 This shows some of the system outputs, e.g.:

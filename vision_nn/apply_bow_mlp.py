@@ -30,9 +30,8 @@ def check_argv():
     """Check the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.strip().split("\n")[0], add_help=False)
     parser.add_argument("model_dir", type=str, help="model directory")
-    parser.add_argument(
-        "subset", type=str, help="subset to apply model to", choices=["flickr8k"]
-        )
+    parser.add_argument("dataset", type=str, help="dataset to apply model to")
+    parser.add_argument("subset", type=str, help="subset to apply model to")
     parser.add_argument("--batch_size", type=int, help="batch size (default: %(default)s)", default=1)
     if len(sys.argv) == 1:
         parser.print_help()
@@ -45,7 +44,7 @@ def check_argv():
 #-----------------------------------------------------------------------------#
 
 
-def apply_model(model_dir, subset, batch_size=1, config=None):
+def apply_model(model_dir, data_dir, subset, batch_size=1, config=None):
     
     # Load the model options
     options_dict_fn = path.join(model_dir, "options_dict.pkl")
@@ -55,11 +54,20 @@ def apply_model(model_dir, subset, batch_size=1, config=None):
 
     # Data
     print datetime.now()
-    if subset == "flickr8k":
-        npz_fn = path.join("..", "vision_nn_flickr30k", "data", "flickr8k", "fc7.npz")
-        print "Reading:", npz_fn
-        features_dict = np.load(npz_fn)
-        image_keys = sorted(features_dict.keys())
+    npz_fn = path.join(data_dir, "fc7.npz")
+    print "Reading:", npz_fn
+    features_dict = np.load(npz_fn)
+    subset_fn = path.join(data_dir, subset + ".txt")
+    print "Reading:", subset_fn
+    image_keys = []
+    with open(subset_fn, "r") as f:
+        for line in f:
+            image_keys.append(line.strip())
+    # if subset == "flickr8k":
+    #     npz_fn = path.join("..", "vision_nn_flickr30k", "data", "flickr8k", "fc7.npz")
+    #     print "Reading:", npz_fn
+    #     features_dict = np.load(npz_fn)
+    #     image_keys = sorted(features_dict.keys())
     # else:
     #     npz_fn = path.join(options_dict["data_dir"], "fc7.npz")
     #     print "Reading:", npz_fn
@@ -139,9 +147,11 @@ def main():
         config = None
 
     sigmoid_output_dict = apply_model(
-        args.model_dir, args.subset, args.batch_size, config=config
+        args.model_dir, path.join("data", args.dataset), args.subset, args.batch_size, config=config
         )
-    sigmoid_output_dict_fn = path.join(args.model_dir, "sigmoid_output_dict." + args.subset + ".npz")
+    sigmoid_output_dict_fn = path.join(
+        args.model_dir, "sigmoid_output_dict." + args.dataset + "." + args.subset + ".npz"
+        )
     print "Writing:", sigmoid_output_dict_fn
     np.savez_compressed(sigmoid_output_dict_fn, **sigmoid_output_dict)
     # with open(sigmoid_output_dict_fn, "wb") as f:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Convert the MSCOCO captions to word IDs.
+Convert captions to word IDs.
 
 Author: Herman Kamper
 Contact: kamperh@gmail.com
@@ -54,7 +54,7 @@ def main():
     with open(args.captions_fn) as f:
         for line in f:
             line = line.strip().split()
-            utt = line[0]
+            utt = line[0].replace(".jpg#", "_")
             captions_dict[utt] = [i.lower() for i in line[1:] if re.match(r"^[a-z\-']*$", i.lower())]
             word_tokens.extend(captions_dict[utt])
     print datetime.now()

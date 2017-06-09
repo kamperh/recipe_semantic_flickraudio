@@ -18,17 +18,14 @@ import sys
 
 sys.path.append("..")
 
-from paths import flickr30k_dir
-
 output_dir = path.join("data", "mscoco+flickr30k")
-mscoco_train_npz_fn = path.join("data", "mscoco", "train", "fc7.npz")
+mscoco_npz_fn = path.join("data", "mscoco", "fc7.npz")
 mscoco_train_list_fn = path.join("data", "mscoco", "train.txt")
-mscoco_val_npz_fn = path.join("data", "mscoco", "val", "fc7.npz")
 mscoco_val_list_fn = path.join("data", "mscoco", "val.txt")
-mscoco_captions_fn = path.join("data", "mscoco", "captions_trainval.txt")
-flickr30k_npz_fn = path.join("..", "vision_nn_flickr30k", "data", "flickr30k", "fc7.npz")
-flickr30k_train_list_fn = path.join("..", "data", "flickr30k_all_no8k.txt")
-flickr30k_captions_fn = path.join(flickr30k_dir, "results_20130124.token")
+mscoco_captions_fn = path.join("data", "mscoco", "captions.txt")
+flickr30k_npz_fn = path.join("data", "flickr30k", "fc7.npz")
+flickr30k_train_list_fn = path.join("data", "flickr30k", "all_no8k.txt")
+flickr30k_captions_fn = path.join("data", "flickr30k", "captions.txt")
 
 
 def main():
@@ -38,13 +35,9 @@ def main():
     # Create output directory
     if not path.isdir(output_dir):
         os.makedirs(output_dir)
-    for d in ["train", "val"]:
-        d = path.join(output_dir, d)
-        if not path.isdir(d):
-            os.makedirs(d)
 
     # Combine captions
-    captions_fn = path.join(output_dir, "captions_trainval.txt")
+    captions_fn = path.join(output_dir, "captions.txt")
     if not path.isfile(captions_fn):
         print("Reading: " + mscoco_captions_fn)
         captions_dict = {}
@@ -72,28 +65,23 @@ def main():
     print(datetime.now())
 
     # Combine Numpy archives
-    train_npz_fn = path.join(output_dir, "train", "fc7.npz")
-    if not path.isfile(train_npz_fn):
-        print("Reading: " + mscoco_train_npz_fn)
-        mscoco_train_npz = np.load(mscoco_train_npz_fn)
+    combined_npz_fn = path.join(output_dir, "fc7.npz")
+    if not path.isfile(combined_npz_fn):
+        print("Reading: " + mscoco_npz_fn)
+        mscoco_npz = np.load(mscoco_npz_fn)
         print("Reading: " + flickr30k_npz_fn)
         flickr30k_npz = np.load(flickr30k_npz_fn)
-        train_dict = {}
-        for image_label in mscoco_train_npz:
-            train_dict[image_label] = mscoco_train_npz[image_label]
+        combined_dict = {}
+        for image_label in mscoco_npz:
+            combined_dict[image_label] = mscoco_npz[image_label]
         for image_label in flickr30k_npz:
-            train_dict[image_label] = flickr30k_npz[image_label]
-        print("Writing: " + train_npz_fn)
-        np.savez(train_npz_fn, **train_dict)
-        print("No. images: " + str(len(train_dict)))
+            combined_dict[image_label] = flickr30k_npz[image_label]
+        print("Writing: " + combined_npz_fn)
+        np.savez(combined_npz_fn, **combined_dict)
+        print("No. images: " + str(len(combined_dict)))
     else:
-        print("Existing Numpy archive: " + train_npz_fn)
-    val_npz_fn = path.join(output_dir, "val", "fc7.npz")
-    if not path.isfile(val_npz_fn):
-        print("Copying: {} to {}".format(mscoco_val_npz_fn, val_npz_fn))
-        copyfile(mscoco_val_npz_fn, val_npz_fn)
-    else:
-        print("Existing Numpy archive: " + val_npz_fn)
+        print("Existing Numpy archive: " + combined_npz_fn)
+
 
     print(datetime.now())
 

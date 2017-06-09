@@ -16,6 +16,7 @@ import hashlib
 import numpy as np
 import os
 import random
+import shutil
 import sys
 import tensorflow as tf
 
@@ -31,13 +32,24 @@ from tflego.blocks import TF_DTYPE, TF_ITYPE, NP_DTYPE
 #-----------------------------------------------------------------------------#
 
 default_options_dict = {
-    "data_dir": "data/mscoco+flickr30k", # "data/mscoco", # "data/temp", # 
-    "label_dict": "captions_word_ids_content_dict.pkl", # "captions_word_ids_dict.pkl", # 
-    "model_dir": "models/train_bow_mlp",
-    "n_max_epochs": 25,  # 75
+    # "data_dir": "data/flickr30k", # "data/mscoco", # "data/temp", # 
+    # "model_dir": "models/flickr30k/train_bow_mlp",
+    # "train_list": "train",
+    # "val_list": "dev",
+    # "data_dir": "data/mscoco", # "data/mscoco", # "data/temp", # 
+    # "model_dir": "models/mscoco/train_bow_mlp",
+    # "train_list": "train",
+    # "val_list": "val",
+    "data_dir": "data/mscoco+flickr30k",
+    "model_dir": "models/mscoco+flickr30k/train_bow_mlp",
+    "train_list": "train",
+    "val_list": "val",
+    "content_words": True,  # if True, only train on content words
+    "n_max_epochs": 100,  # 75
     "batch_size": 256,  # 256
     "ff_keep_prob": 0.75, # 0.75,
     "n_most_common": 1000,
+    # "pos_weight": 100.0,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
     "n_hiddens": [3072, 3072, 3072, 3072],
     # "optimizer": {
     #     "type": "sgd",
@@ -48,9 +60,9 @@ default_options_dict = {
         "learning_rate": 0.0001
     },
     "detect_sigmoid_threshold": 0.5,
-    "train_bow_type": "single",  # "single", "average", "top_k"
+    "train_bow_type": "single",  # "single", "average", "average_greg", "top_k"
     "rnd_seed": 0,
-    "early_stopping": True,
+    "early_stopping": False, # True, # False,
     }
 
 
@@ -70,8 +82,7 @@ def check_argv():
     return parser.parse_args()
 
 
-def load_mscoco_bow_labelled(data_dir, subset, label_dict, n_bow, 
-        bow_type="single"):
+def load_bow_labelled(features_dict, data_dir, subset_list, label_dict, n_bow, bow_type="single"):
     """
     Return the MSCOCO image matrices and bag-of-word label vectors.
 
@@ -84,13 +95,8 @@ def load_mscoco_bow_labelled(data_dir, subset, label_dict, n_bow,
         number of captions; "top_k" keeps only the top k most common words.
     """
 
-    assert subset in ["train", "val"]
-
     # Load data and shuffle
-    npz_fn = path.join(data_dir, subset, "fc7.npz")
-    print "Reading:", npz_fn
-    features_dict = np.load(npz_fn)
-    subset_fn = path.join(data_dir, subset + ".txt")
+    subset_fn = path.join(data_dir, subset_list + ".txt")
     print "Reading:", subset_fn
     image_keys = []
     with open(subset_fn, "r") as f:
@@ -204,10 +210,18 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
     # LOAD AND FORMAT DATA
 
     # Read word ID labels
-    label_dict_fn = path.join(options_dict["data_dir"], options_dict["label_dict"])
+    if options_dict["content_words"]:
+        label_dict_fn = path.join(options_dict["data_dir"], "captions_word_ids_content_dict.pkl")
+        word_to_id_fn = path.join(options_dict["data_dir"], "word_to_id_content.pkl")
+    else:
+        label_dict_fn = path.join(options_dict["data_dir"], "captions_word_ids_dict.pkl")
+        word_to_id_fn = path.join(options_dict["data_dir"], "word_to_id.pkl")
     print "Reading:", label_dict_fn
     with open(label_dict_fn, "rb") as f:
         label_dict = pickle.load(f)
+    word_to_id_dest_fn = path.join(model_dir, "word_to_id.pkl")
+    print "Copying", word_to_id_fn
+    shutil.copyfile(word_to_id_fn, word_to_id_dest_fn)
 
     # Filter out uncommon words (assume IDs sorted by count)
     print "Keeping most common words:", options_dict["n_most_common"]
@@ -215,12 +229,17 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
         label_dict[image_key] = [i for i in label_dict[image_key] if i < options_dict["n_most_common"]]
 
     # Load image data
-    train_x, train_y_bow = load_mscoco_bow_labelled(
-        options_dict["data_dir"], "train", label_dict,
-        options_dict["n_most_common"], bow_type=options_dict["train_bow_type"]
+    npz_fn = path.join(options_dict["data_dir"], "fc7.npz")
+    print "Reading:", npz_fn
+    features_dict = np.load(npz_fn)
+    train_x, train_y_bow = load_bow_labelled(
+        features_dict, options_dict["data_dir"], options_dict["train_list"],
+        label_dict, options_dict["n_most_common"],
+        bow_type=options_dict["train_bow_type"]
         )
-    dev_x, dev_y_bow = load_mscoco_bow_labelled(
-        options_dict["data_dir"], "val", label_dict, options_dict["n_most_common"]
+    dev_x, dev_y_bow = load_bow_labelled(
+        features_dict, options_dict["data_dir"], options_dict["val_list"],
+        label_dict, options_dict["n_most_common"]
         )
     print "Train items shape:", train_x.shape
     print "Dev items shape:", dev_x.shape
@@ -275,7 +294,12 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
     mlp = build_bow_mlp_from_options_dict(x, keep_prob, options_dict)
 
     # Training tensors
-    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(mlp, y))
+    if "pos_weight" in options_dict and options_dict["pos_weight"] != 1.:
+        loss = tf.reduce_mean(
+            tf.nn.weighted_cross_entropy_with_logits(mlp, y, options_dict["pos_weight"])
+            )
+    else:
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(mlp, y))
     if options_dict["optimizer"]["type"] == "sgd":
         optimizer_class = tf.train.GradientDescentOptimizer
     elif options_dict["optimizer"]["type"] == "momentum":
