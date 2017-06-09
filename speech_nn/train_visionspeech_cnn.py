@@ -57,14 +57,17 @@ default_options_dict = {
     #     "../sandbox_vision_nn_mscoco/models/train_bow_mlp/79bae2dea9/sigmoid_output_dict.flickr8k.npz",
     # "visionsig_npz":
     #     "../sandbox_vision_nn_mscoco/models/train_bow_mlp/4f75fe660a/sigmoid_output_dict.flickr8k.npz",
+    # "word_to_id_dict": "../sandbox_vision_nn_mscoco/data/mscoco+flickr30k/word_to_id_content.pkl", 
+    # "visionsig_npz":
+    #     "../vision_nn/models/mscoco+flickr30k/train_bow_mlp/d672e54928/sigmoid_output_dict.flickr8k.all.npz",
     "visionsig_npz":
-        "../sandbox_vision_nn_mscoco/models/train_bow_mlp/582ce15ca3/sigmoid_output_dict.flickr8k.npz",
-    "word_to_id_dict": "../sandbox_vision_nn_mscoco/data/mscoco+flickr30k/word_to_id_content.pkl", 
+        "../vision_nn/models/mscoco+flickr30k/train_bow_mlp/2aa004cb39/sigmoid_output_dict.flickr8k.all.npz",
     "model_dir": "models/train_visionspeech_cnn",
     "visionsig_threshold": None,  # if None, sigmoids are used as targets directly
     "n_most_common": 1000,  # needs to be less than the dimensionality of the
                             # vision sigmoids; if None, then the full vision
                             # dimensionality is used
+    # "pos_weight": 2,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
     "n_max_epochs": 15,  # 15
     "batch_size": 16,  # 16
     "ff_keep_prob": 1.0,
@@ -192,7 +195,7 @@ def train_visionspeech_cnn(options_dict=None, config=None, model_dir=None, extri
         word_to_id_dict_fn = path.join(path.split(options_dict["visionsig_npz"])[0], "word_to_id.pkl")
     else:
         word_to_id_dict_fn = options_dict["word_to_id_dict"]
-    print "Reading:", 
+    print "Reading:", word_to_id_dict_fn
     with open(word_to_id_dict_fn, "rb") as f:
         word_to_id = pickle.load(f)
     print "Reading:", options_dict["visionsig_npz"]
@@ -285,7 +288,12 @@ def train_visionspeech_cnn(options_dict=None, config=None, model_dir=None, extri
     cnn = build_bow_cnn_from_options_dict(x, keep_prob, options_dict)
 
     # Training tensors
-    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(cnn, y))
+    if "pos_weight" in options_dict and options_dict["pos_weight"] != 1.:
+        loss = tf.reduce_mean(
+            tf.nn.weighted_cross_entropy_with_logits(cnn, y, options_dict["pos_weight"])
+            )
+    else:
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(cnn, y))
     if options_dict["optimizer"]["type"] == "sgd":
         optimizer_class = tf.train.GradientDescentOptimizer
     elif options_dict["optimizer"]["type"] == "momentum":

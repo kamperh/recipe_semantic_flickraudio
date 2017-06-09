@@ -286,7 +286,7 @@ def main():
         word_to_id, options_dict["n_most_common"], sigmoid_output_dict, true_dict, args.plot
         )
 
-    print
+    # print
     print "-"*79
     print "Sigmoid threshold: {:.2f}".format(args.sigmoid_threshold)
     print "No. predictions:", n_pred
@@ -297,7 +297,7 @@ def main():
     print "Average precision: {:.4f}%".format(average_precision*100.)
     print "-"*79
 
-    print
+    # print
     print datetime.now()
 
 

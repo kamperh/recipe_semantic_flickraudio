@@ -49,6 +49,7 @@ default_options_dict = {
     "batch_size": 256,  # 256
     "ff_keep_prob": 0.75, # 0.75,
     "n_most_common": 1000,
+    # "pos_weight": 100.0,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
     "n_hiddens": [3072, 3072, 3072, 3072],
     # "optimizer": {
     #     "type": "sgd",
@@ -61,7 +62,7 @@ default_options_dict = {
     "detect_sigmoid_threshold": 0.5,
     "train_bow_type": "single",  # "single", "average", "average_greg", "top_k"
     "rnd_seed": 0,
-    "early_stopping": False,
+    "early_stopping": False, # True, # False,
     }
 
 
@@ -293,7 +294,12 @@ def train_bow_mlp(options_dict=None, config=None, model_dir=None):
     mlp = build_bow_mlp_from_options_dict(x, keep_prob, options_dict)
 
     # Training tensors
-    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(mlp, y))
+    if "pos_weight" in options_dict and options_dict["pos_weight"] != 1.:
+        loss = tf.reduce_mean(
+            tf.nn.weighted_cross_entropy_with_logits(mlp, y, options_dict["pos_weight"])
+            )
+    else:
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(mlp, y))
     if options_dict["optimizer"]["type"] == "sgd":
         optimizer_class = tf.train.GradientDescentOptimizer
     elif options_dict["optimizer"]["type"] == "momentum":
