@@ -32,11 +32,11 @@ from tflego.blocks import TF_DTYPE, TF_ITYPE, NP_DTYPE
 #-----------------------------------------------------------------------------#
 
 default_options_dict = {
-    # "data_dir": "data/flickr30k", # "data/mscoco", # "data/temp", # 
+    # "data_dir": "data/flickr30k",
     # "model_dir": "models/flickr30k/train_bow_mlp",
     # "train_list": "train",
     # "val_list": "dev",
-    # "data_dir": "data/mscoco", # "data/mscoco", # "data/temp", # 
+    # "data_dir": "data/mscoco",
     # "model_dir": "models/mscoco/train_bow_mlp",
     # "train_list": "train",
     # "val_list": "val",
@@ -45,12 +45,12 @@ default_options_dict = {
     "train_list": "train",
     "val_list": "val",
     "content_words": True,  # if True, only train on content words
-    "n_max_epochs": 100,  # 75
-    "batch_size": 256,  # 256
+    "n_max_epochs": 75,  # 75
+    "batch_size": 1024,  # 256
     "ff_keep_prob": 0.75, # 0.75,
     "n_most_common": 1000,
-    # "pos_weight": 100.0,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
-    "n_hiddens": [3072, 3072, 3072, 3072],
+    # "pos_weight": 2.0,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
+    "n_hiddens": [2048, 2048, 2048, 2048], # [3072, 3072, 3072, 3072],
     # "optimizer": {
     #     "type": "sgd",
     #     "learning_rate": 0.001
@@ -60,9 +60,9 @@ default_options_dict = {
         "learning_rate": 0.0001
     },
     "detect_sigmoid_threshold": 0.5,
-    "train_bow_type": "single",  # "single", "average", "average_greg", "top_k"
+    "train_bow_type": "single",  # "single"  # "single", "average", "average_min0.5", "top_k"
     "rnd_seed": 0,
-    "early_stopping": False, # True, # False,
+    "early_stopping": True, # False, # 
     }
 
 
@@ -92,7 +92,9 @@ def load_bow_labelled(features_dict, data_dir, subset_list, label_dict, n_bow, b
         How should the multiple captions be handled in constructing the
         bag-of-words vector: "single" assigns 1 to a word that occurs in any of
         the captions; "average" sums the word counts and then divides by the
-        number of captions; "top_k" keeps only the top k most common words.
+        number of captions; "average_min0.5" assigns a probability of 1 to
+        words that were annotated 5 times and 0.5 to words that were annotated
+        1 times; "top_k" keeps only the top k most common words.
     """
 
     # Load data and shuffle
@@ -125,9 +127,47 @@ def load_bow_labelled(features_dict, data_dir, subset_list, label_dict, n_bow, b
                 if not label_key in label_dict:
                     print "Warning: Missing label " + label_key
                 else:
-                    for i_word in label_dict[label_key]:
-                        bow_vectors[i_data, i_word] += 1
+                    for i_word in set(label_dict[label_key]):
+                        bow_vectors[i_data, i_word] += 1.
             bow_vectors[i_data, :] = bow_vectors[i_data, :]/5.
+    # elif bow_type == "average_min0.5":
+    #     c = 3/8.
+    #     m = 1/8.
+    #     for i_data, image_key in enumerate(image_keys):
+    #         for i_caption in xrange(5):
+    #             label_key = "{}_{}".format(image_key, i_caption)
+    #             if not label_key in label_dict:
+    #                 print "Warning: Missing label " + label_key
+    #             else:
+    #                 for i_word in label_dict[label_key]:
+    #                     bow_vectors[i_data, i_word] += 1.
+    #         # bow_vectors[i_data, :] = bow_vectors[i_data, :]/5.
+    #         indices = np.where(bow_vectors[i_data, :] >= 1)
+    #         bow_vectors[i_data, indices] = m*bow_vectors[i_data, indices] + c
+    #         if len(np.where(bow_vectors[i_data, :] > 1.0)[0]) != 0:
+    #             for i_caption in xrange(5):
+    #                 label_key = "{}_{}".format(image_key, i_caption)
+    #                 print i_data, image_key, label_key, label_dict[label_key]
+    #             assert False
+    elif "average_min" in bow_type:
+        b = float(bow_type.replace("average_min", ""))
+        c = 0.25*(5*b - 1)
+        m = b - c
+        for i_data, image_key in enumerate(image_keys):
+            for i_caption in xrange(5):
+                label_key = "{}_{}".format(image_key, i_caption)
+                if not label_key in label_dict:
+                    print "Warning: Missing label " + label_key
+                else:
+                    for i_word in set(label_dict[label_key]):
+                        bow_vectors[i_data, i_word] += 1.
+            indices = np.where(bow_vectors[i_data, :] >= 1)
+            bow_vectors[i_data, indices] = m*bow_vectors[i_data, indices] + c
+            if len(np.where(bow_vectors[i_data, :] > 1.0)[0]) != 0:
+                # for i_caption in xrange(5):
+                #     label_key = "{}_{}".format(image_key, i_caption)
+                #     print i_data, image_key, label_key, label_dict[label_key], set(label_dict[label_key])
+                assert False
     elif bow_type == "top_k":
         k = 10
         for i_data, image_key in enumerate(image_keys):

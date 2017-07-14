@@ -106,6 +106,7 @@ def eval_average_precision(word_to_id, n_most_common, sigmoid_output_dict, true_
         word_tokens.extend(true_dict[utt])
     # last_id = max(word_to_id.values())
     max_sigmoid_id = n_most_common - 1
+    last_id = max_sigmoid_id
     for word in sorted(set(word_tokens)):
         if word not in word_to_id:
             word_to_id[word] = last_id + 1

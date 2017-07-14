@@ -50,7 +50,6 @@ Apply VGG-16 to the MSCOCO train, val and test splits:
 
 Prepare datasets in common format
 ---------------------------------
-
 Prepare Flickr8k data:
 
     ./data_prep_flickr8k.py
