@@ -40,9 +40,12 @@ default_options_dict = {
     "speech_label_dict": "data/captions_content_dict.pkl", 
     # "visionsig_npz":
     #     "../vision_nn_flickr30k/models/train_bow_mlp/4611301850/sigmoid_output_dict.flickr8k.npz",
+    # "visionsig_npz":
+    #     "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz",
+    # "word_to_id_dict": "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl", 
+    # MSCOCO+Flickr30k vision system
     "visionsig_npz":
-        "../vision_nn_flickr30k/models/train_bow_mlp/dea2850778/sigmoid_output_dict.flickr8k.npz",
-    "word_to_id_dict": "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl", 
+        "../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz",
     "model_dir": "models/train_visionspeech_psyc",
     "visionsig_threshold": None,  # if None, sigmoids are used as targets directly
     "n_padded": 800,
@@ -62,12 +65,12 @@ default_options_dict = {
         "learning_rate": 0.001
     },
     "filter_shapes": [
-        [39, 9, 1, 96],
-        [1, 10, 96, 96],
-        [1, 10, 96, 96],
-        [1, 10, 96, 96],
-        [1, 10, 96, 96],
-        [1, 10, 96, 1000],
+        [39, 9, 1, 100],
+        [1, 10, 100, 100],
+        [1, 10, 100, 100],
+        [1, 10, 100, 100],
+        [1, 10, 100, 100],
+        [1, 10, 100, 1000],
         # [1, 10, 64, 256],
         # [1, 11, 256, 1000]
     ],
@@ -133,8 +136,12 @@ def train_visionspeech_psyc(options_dict=None, config=None, model_dir=None, extr
     print "Reading:", options_dict["speech_label_dict"]
     with open(options_dict["speech_label_dict"], "rb") as f:
         speech_label_dict = pickle.load(f)
-    print "Reading:", options_dict["word_to_id_dict"]
-    with open(options_dict["word_to_id_dict"], "rb") as f:
+    if "word_to_id_dict" not in options_dict:
+        word_to_id_dict_fn = path.join(path.split(options_dict["visionsig_npz"])[0], "word_to_id.pkl")
+    else:
+        word_to_id_dict_fn = options_dict["word_to_id_dict"]
+    print "Reading:", word_to_id_dict_fn
+    with open(word_to_id_dict_fn, "rb") as f:
         word_to_id = pickle.load(f)
     print "Reading:", options_dict["visionsig_npz"]
     visionsig_dict = np.load(options_dict["visionsig_npz"])
@@ -348,7 +355,9 @@ def check_argv():
         "and where previous models would be searched for",
         default=None
         )
-    # parser.add_argument("--n_max_epochs", type=int, default=None)
+    parser.add_argument(
+        "--batch_size", help="default: %(default)s", type=int, default=default_options_dict["batch_size"]
+        )
     parser.add_argument("--extrinsic", help="perform extrinsic evaluation", action="store_true")
     return parser.parse_args()
 
@@ -369,6 +378,7 @@ def main():
 
     # Set options
     options_dict = default_options_dict.copy()
+    options_dict["batch_size"] = args.batch_size
     options_dict["script"] = "train_visionspeech_psyc"
 
     # Train model

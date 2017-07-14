@@ -37,6 +37,19 @@ The Flickr8k dataset can also be browsed directly
 [here](http://nlp.cs.illinois.edu/HockenmaierGroup/8k-pictures.html).
 
 
+Directory structure
+-------------------
+- `data/` - Contains permanent data (file lists, annotations) that are used
+  elsewhere.
+- `vision_nn` - Vision systems trained on Flickr30k, MSCOCO and
+  Flickr30k+MSCOCO, with the system vocabulary given by the training data of
+  the specific data partition.
+- `vision_nn_1k` - Vision systems trained on Flickr30k, MSCOCO and
+  Flickr30k+MSCOCO, but with the vocabulary given by the 1k most common words
+  in Flickr30k+MSCOCO. Evaluation is also only for those 1k words.
+- `vision_nn_flickr30k` - Vision systems trained on Flickr30k.
+
+
 Preliminary
 -----------
 Install all the standalone dependencies (below). Then clone the required GitHub
@@ -67,7 +80,6 @@ Train the various visually grounded speech models by running the steps in
 
 Dependencies
 ------------
-
 Standalone packages:
 
 - [Python](https://www.python.org/)

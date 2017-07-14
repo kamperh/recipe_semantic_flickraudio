@@ -38,38 +38,32 @@ import data_io
 default_options_dict = {
     "speech_data_dir": "data/mfcc_cmvn_dd_vad",  # "data/fbank_vad"
     "speech_label_dict": "data/captions_content_dict.pkl",
-    # Flickr30k without any Flickr8k dev or test
+    # # Flickr30k vision system
     # "visionsig_npz":
-    #     "../vision_nn_flickr30k/models/train_bow_mlp/bc22ca83c9/sigmoid_output_dict.flickr8k.npz",
-    # "word_to_id_dict": "../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl", 
-    # # MSCOCO
+    #     "../vision_nn/models/flickr30k/train_bow_mlp/00d784c7bc/sigmoid_output_dict.flickr8k.all.npz",
+    # # MSCOCO vision system
     # "visionsig_npz":
-    #     "../vision_nn_mscoco/models/train_bow_mlp/f06da7e2fe/sigmoid_output_dict.flickr8k.npz",
-    # "word_to_id_dict": "../vision_nn_mscoco/data/mscoco/word_to_id_content.pkl", 
-    # MSCOCO+flickr30k
+    #     "../vision_nn/models/mscoco/train_bow_mlp/24823c886f/sigmoid_output_dict.flickr8k.all.npz",
+    # # MSCOCO+Flickr30k vision system
     # "visionsig_npz":
-    #     "../vision_nn_mscoco/models/train_bow_mlp/4f75fe660a/sigmoid_output_dict.flickr8k.npz",
+    #     "../vision_nn/models/mscoco+flickr30k/train_bow_mlp/3458dd3418/sigmoid_output_dict.flickr8k.all.npz",
+    # # Flickr30k vision system
     # "visionsig_npz":
-    #     "../vision_nn_mscoco/models/train_bow_mlp/1cc977bfa8/sigmoid_output_dict.flickr8k.npz",
-    # "word_to_id_dict": "../vision_nn_mscoco/data/mscoco+flickr30k/word_to_id_content.pkl", 
-    # MSCOCO+flickr30k Sandbox
+    #     "../vision_nn_1k/models/flickr30k/train_bow_mlp/8238e9467f/sigmoid_output_dict.flickr8k.all.npz",
+    # # MSCOCO vision system
     # "visionsig_npz":
-    #     "../sandbox_vision_nn_mscoco/models/train_bow_mlp/79bae2dea9/sigmoid_output_dict.flickr8k.npz",
-    # "visionsig_npz":
-    #     "../sandbox_vision_nn_mscoco/models/train_bow_mlp/4f75fe660a/sigmoid_output_dict.flickr8k.npz",
-    # "word_to_id_dict": "../sandbox_vision_nn_mscoco/data/mscoco+flickr30k/word_to_id_content.pkl", 
-    # "visionsig_npz":
-    #     "../vision_nn/models/mscoco+flickr30k/train_bow_mlp/d672e54928/sigmoid_output_dict.flickr8k.all.npz",
+    #     "../vision_nn_1k/models/mscoco/train_bow_mlp/f0ac71af30/sigmoid_output_dict.flickr8k.all.npz",
+    # MSCOCO+Flickr30k vision system
     "visionsig_npz":
-        "../vision_nn/models/mscoco+flickr30k/train_bow_mlp/2aa004cb39/sigmoid_output_dict.flickr8k.all.npz",
+        "../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz",
     "model_dir": "models/train_visionspeech_cnn",
     "visionsig_threshold": None,  # if None, sigmoids are used as targets directly
     "n_most_common": 1000,  # needs to be less than the dimensionality of the
                             # vision sigmoids; if None, then the full vision
                             # dimensionality is used
-    # "pos_weight": 2,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
+    # "pos_weight": 0.5,  # 1.0 # if specified, the `weighted_cross_entropy_with_logits` loss is used
     "n_max_epochs": 15,  # 15
-    "batch_size": 16,  # 16
+    "batch_size": 8,  # 16
     "ff_keep_prob": 1.0,
     "center_padded": True,
     # "optimizer": {
@@ -91,8 +85,8 @@ default_options_dict = {
         [1, 3],
         [1, 75]
     ],
-    "detect_sigmoid_threshold": 0.4,
-    "n_hiddens": [4096],  # 4096
+    "detect_sigmoid_threshold": 0.3,
+    "n_hiddens": [3000],  # 3000
     "rnd_seed": 42,
     }
 # # Interspeech 2017 training settings:
