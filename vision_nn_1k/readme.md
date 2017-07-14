@@ -20,14 +20,12 @@ Apply VGG-16 to Flickr8k:
         /share/data/lang/users/kamperh/flickr_multimod/Flickr8k_Dataset/Flicker8k_Dataset/ \
         data/flickr8k/fc7.npz
 
-
 Apply VGG-16 to Flickr30k:
 
     mkdir -p data/flickr30k/
     ./apply_vgg16.py --crop --output_layer fc7 --batch_size 37 \
         /share/data/vision-greg/flickr30k/flickr30k-images/ \
         data/flickr30k/fc7.npz
-
 
 Apply VGG-16 to the MSCOCO train, val and test splits:
 
