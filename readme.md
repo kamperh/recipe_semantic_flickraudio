@@ -3,6 +3,9 @@ Multimodal Modelling of Flickr Vision and Speech Data
 
 Overview
 --------
+To-do: update the text below to point to new work, but keep reference to
+previous work.
+
 This is a recipe for grounding untranscribed speech using paired images.
 Details are given in [Kamper et al., 2017](https://arxiv.org/abs/1703.08136):
 
@@ -36,6 +39,8 @@ labels from either of these. The Flickr8k text corpus is purely for reference.
 The Flickr8k dataset can also be browsed directly
 [here](http://nlp.cs.illinois.edu/HockenmaierGroup/8k-pictures.html).
 
+To-do: Add MSCOCO above.
+
 
 Directory structure
 -------------------
@@ -48,6 +53,8 @@ Directory structure
   Flickr30k+MSCOCO, but with the vocabulary given by the 1k most common words
   in Flickr30k+MSCOCO. Evaluation is also only for those 1k words.
 - `vision_nn_flickr30k` - Vision systems trained on Flickr30k.
+
+To-do: Remove reference to `vision_nn_flickr30k` above.
 
 
 Preliminary
@@ -70,6 +77,8 @@ Extract filterbank and MFCC features by running the steps in
 
 Neural network training
 -----------------------
+To-do: Change below to point to `vision_nn_1k/`.
+
 Train the multi-label visual classifier by running the steps in
 [vision_nn_flickr30k/readme.md](vision_nn_flickr30k/readme.md). Note the final
 model directory.
