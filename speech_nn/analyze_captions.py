@@ -51,8 +51,7 @@ def main():
     most_common_1k = [i[0] for i in Counter(word_tokens).most_common(1000)]
     word_tokens_1k = [i for i in word_tokens if i in most_common_1k]
     print "No. word tokens in 1k most common types: {} ({}%)".format(
-        len(word_tokens_1k),
-        float(len(word_tokens_1k)) / len(word_tokens) * 100
+        len(word_tokens_1k), float(len(word_tokens_1k)) / len(word_tokens) * 100
         )
 
 
