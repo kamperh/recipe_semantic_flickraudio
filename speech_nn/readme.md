@@ -225,7 +225,7 @@ do an evaluation of exact matches, run:
 To run semantic and exact keyword spotting on the 1000 labelled test
 utterances, run:
 
-    ./eval_semkeyword_spotting.py models/train_visionspeech_cnn/989f00f30a
+    ./eval_model_semkeyword.py models/train_visionspeech_cnn/332147c538
 
 
 Unigram baseline

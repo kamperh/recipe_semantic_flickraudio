@@ -62,7 +62,8 @@ def calculate_eer(y_true, y_score):
     return eer
 
 
-def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict, analyze=False):
+def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict,
+        analyze=False):
     """Return P@10, P@N and EER."""
     
     keywords = sorted(keyword_counts)
