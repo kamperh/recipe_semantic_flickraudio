@@ -32,7 +32,8 @@ def check_argv():
     parser = argparse.ArgumentParser(description=__doc__.strip().split("\n")[0], add_help=False)
     parser.add_argument("model_dir", type=str, help="model directory")
     parser.add_argument(
-        "subset", type=str, help="subset to apply model to", choices=["train", "dev", "test"]
+        "subset", type=str, help="subset to apply model to", choices=["train",
+        "dev", "test", "dev_queries", "dev_queries_all"]
         )
     parser.add_argument("--batch_size", type=int, help="batch size (default: %(default)s)", default=1)
     if len(sys.argv) == 1:
@@ -47,7 +48,7 @@ def check_argv():
 
 def build_model(x, options_dict):
     if options_dict["script"] in ["train_bow_cnn", "train_visionspeech_cnn"]:
-        cnn = train_bow_cnn.build_bow_cnn_from_options_dict(x, 1.0, options_dict)
+        cnn = train_bow_cnn.build_bow_cnn_from_options_dict(x, 1.0, options_dict)["output"]
         cnn = tf.sigmoid(cnn)
         return cnn
     else:

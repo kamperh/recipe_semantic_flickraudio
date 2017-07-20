@@ -173,7 +173,6 @@ def main():
     with open(label_dict, "rb") as f:
         true_dict = pickle.load(f)
 
-
     # Read sigmoid output
     sigmoid_output_dict_fn = path.join(args.model_dir, "sigmoid_output_dict." + args.subset + ".pkl")
     print "Reading:", sigmoid_output_dict_fn

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Get a baseline based slimpy on unigram counts in the training data.
+Get a exclusively vision-based baseline.
 
 Author: Herman Kamper
 Contact: kamperh@gmail.com
@@ -28,7 +28,10 @@ import sys
 def check_argv():
     """Check the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.strip().split("\n")[0], add_help=False)
-    parser.add_argument("sigmoid_npz", type=str, help="Numpy archive with sigmoid activations")
+    parser.add_argument(
+        "sigmoid_npz", type=str,
+        help="Numpy archive with sigmoid activations from vision system"
+        )
     parser.add_argument("word_to_id_pkl", type=str, help="pickled dictionary giving ID to word mapping")
     parser.add_argument(
         "subset", type=str, help="subset to get the baseline for", choices=["dev", "test"]

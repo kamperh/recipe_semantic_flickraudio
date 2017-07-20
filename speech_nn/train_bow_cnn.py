@@ -92,10 +92,11 @@ def build_bow_cnn_from_options_dict(x, keep_prob, options_dict):
         )
     cnn = tf.contrib.layers.flatten(cnn)
     cnn = blocks.build_feedforward(cnn, options_dict["n_hiddens"], keep_prob=keep_prob)
+    final_feedforward = cnn
     with tf.variable_scope("ff_layer_final"):
         cnn = blocks.build_linear(cnn, options_dict["d_out"])
         print "Final linear layer shape:", cnn.get_shape().as_list()
-    return cnn
+    return {"output": cnn, "final_feedword": final_feedword}
 
 
 def train_bow_cnn(options_dict=None, config=None, model_dir=None):
@@ -231,7 +232,7 @@ def train_bow_cnn(options_dict=None, config=None, model_dir=None):
     x = tf.placeholder(TF_DTYPE, [None, d_in])
     y = tf.placeholder(TF_DTYPE, [None, d_out])
     keep_prob = tf.placeholder(TF_DTYPE)
-    cnn = build_bow_cnn_from_options_dict(x, keep_prob, options_dict)
+    cnn = build_bow_cnn_from_options_dict(x, keep_prob, options_dict)["output"]
 
     # Training tensors
     loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(cnn, y))

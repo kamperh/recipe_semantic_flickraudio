@@ -279,7 +279,7 @@ def train_visionspeech_cnn(options_dict=None, config=None, model_dir=None, extri
     x = tf.placeholder(TF_DTYPE, [None, d_in])
     y = tf.placeholder(TF_DTYPE, [None, d_out])
     keep_prob = tf.placeholder(TF_DTYPE)
-    cnn = build_bow_cnn_from_options_dict(x, keep_prob, options_dict)
+    cnn = build_bow_cnn_from_options_dict(x, keep_prob, options_dict)["output"]
 
     # Training tensors
     if "pos_weight" in options_dict and options_dict["pos_weight"] != 1.:

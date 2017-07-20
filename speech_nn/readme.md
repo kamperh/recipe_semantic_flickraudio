@@ -236,6 +236,7 @@ Get unigram baseline and evaluate:
     ./eval_precision_recall.py models/unigram_baseline dev
     ./get_unigram_baseline.py test
     ./eval_precision_recall.py models/unigram_baseline test
+    ./eval_model_semkeyword.py models/unigram_baseline/
 
 On the test set, this model achieves the following scores, as in Table 1 of
 [Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under unigram baseline:
@@ -260,7 +261,7 @@ captions will share the same output). Run:
         ../vision_nn_flickr30k/data/flickr30k/word_to_id_content.pkl \
         dev
     ./eval_precision_recall.py models/vision_nn_baseline_bc22ca83c9 dev
-    ./eval_semkeyword_spotting.py models/vision_nn_baseline_bc22ca83c9 dev
+    ./eval_model_semkeyword.py models/vision_nn_baseline_bc22ca83c9 dev
 
     # MSCOCO
     ./get_vision_baseline.py \
@@ -269,8 +270,39 @@ captions will share the same output). Run:
         dev
     ./eval_precision_recall.py models/vision_nn_baseline_c4e6b8d7a7 dev
 
-The `vision_npz` variable in the script can be changed to pick a specific
-vision model.
+    # MSCOCO+Flickr30k
+    ./get_vision_baseline.py \
+        ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz \
+        ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/word_to_id.pkl \
+        test
+    ./eval_precision_recall.py models/vision_nn_baseline_891a3a3533 test
+    ./eval_model_semkeyword.py models/vision_nn_baseline_891a3a3533
+
+Every utterance is encoded as the average visual BoW vector (so all captions).
+Run to get this visual tag prior:
+
+    # MSCOCO+Flickr30k
+    ./get_vision_tag_prior.py \
+        ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz \
+        ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/word_to_id.pkl \
+        test
+    ./eval_model_semkeyword.py models/vision_tag_prior_891a3a3533
+
+
+Query vizualization
+-------------------
+To split a particular subset in to queries and a search collection, run:
+
+    ./get_queries_search.py mfcc_cmvn_dd_vad dev
+
+Note that `for utt_key in sorted(query_utt_keys)` and subsequent lines can
+be switched to obtain more terms; this was done to get the `dev_queries_all`
+options below.
+
+To pass these queries through a given model, run:
+
+    ./apply_bow_cnn.py models/train_bow_cnn/7482d6f5f5 dev_queries_all
+    ./apply_bow_cnn.py models/train_visionspeech_cnn/332147c538 dev_queries_all
 
 
 Model notebook
