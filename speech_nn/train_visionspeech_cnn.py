@@ -86,7 +86,7 @@ default_options_dict = {
         [1, 75]
     ],
     "detect_sigmoid_threshold": 0.3,
-    "n_hiddens": [3000],  # 3000
+    "n_hiddens": [3000, 256],  # 3000
     "rnd_seed": 42,
     }
 # # Interspeech 2017 training settings:

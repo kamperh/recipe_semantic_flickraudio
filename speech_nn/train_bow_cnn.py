@@ -76,7 +76,7 @@ default_options_dict = {
     #     [1, 75]
     # ],
     "detect_sigmoid_threshold": 0.3,
-    "n_hiddens": [3000], # [4096],
+    "n_hiddens": [3000, 256], # [4096],
     "rnd_seed": 42,
     }
 
