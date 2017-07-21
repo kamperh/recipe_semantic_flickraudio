@@ -96,7 +96,7 @@ def build_bow_cnn_from_options_dict(x, keep_prob, options_dict):
     with tf.variable_scope("ff_layer_final"):
         cnn = blocks.build_linear(cnn, options_dict["d_out"])
         print "Final linear layer shape:", cnn.get_shape().as_list()
-    return {"output": cnn, "final_feedword": final_feedword}
+    return {"output": cnn, "final_feedforward": final_feedforward}
 
 
 def train_bow_cnn(options_dict=None, config=None, model_dir=None):

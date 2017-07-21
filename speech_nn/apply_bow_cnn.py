@@ -35,6 +35,10 @@ def check_argv():
         "subset", type=str, help="subset to apply model to", choices=["train",
         "dev", "test", "dev_queries", "dev_queries_all"]
         )
+    parser.add_argument(
+        "--layer", type=str, help="layer to take output from (default: %(default)s)",
+        choices=["output", "final_feedforward"], default="output"
+        )
     parser.add_argument("--batch_size", type=int, help="batch size (default: %(default)s)", default=1)
     if len(sys.argv) == 1:
         parser.print_help()
@@ -46,16 +50,17 @@ def check_argv():
 #                             APPLY CNN FUNCTIONS                             #
 #-----------------------------------------------------------------------------#
 
-def build_model(x, options_dict):
+def build_model(x, options_dict, layer="output"):
     if options_dict["script"] in ["train_bow_cnn", "train_visionspeech_cnn"]:
-        cnn = train_bow_cnn.build_bow_cnn_from_options_dict(x, 1.0, options_dict)["output"]
-        cnn = tf.sigmoid(cnn)
+        cnn = train_bow_cnn.build_bow_cnn_from_options_dict(x, 1.0, options_dict)[layer]
+        if layer == "output":
+            cnn = tf.sigmoid(cnn)
         return cnn
     else:
         assert False
 
 
-def apply_model(model_dir, subset, batch_size=1, config=None):
+def apply_model(model_dir, subset, batch_size=1, layer="output", config=None):
 
     # Load the model options
     options_dict_fn = path.join(model_dir, "options_dict.pkl")
@@ -95,7 +100,7 @@ def apply_model(model_dir, subset, batch_size=1, config=None):
 
     # Build model
     x = tf.placeholder(TF_DTYPE, [None, options_dict["d_in"]])
-    cnn = build_model(x, options_dict)
+    cnn = build_model(x, options_dict, layer)
 
     print datetime.now()
 
@@ -144,9 +149,12 @@ def main():
         config = None
 
     sigmoid_output_dict = apply_model(
-        args.model_dir, args.subset, args.batch_size, config=config
+        args.model_dir, args.subset, args.batch_size, layer=args.layer,
+        config=config
         )
-    sigmoid_output_dict_fn = path.join(args.model_dir, "sigmoid_output_dict." + args.subset + ".pkl")
+    sigmoid_output_dict_fn = path.join(
+        args.model_dir, "sigmoid_" + args.layer + "_dict." + args.subset + ".pkl"
+        )
     print "Writing:", sigmoid_output_dict_fn
     with open(sigmoid_output_dict_fn, "wb") as f:
         pickle.dump(sigmoid_output_dict, f, -1)
