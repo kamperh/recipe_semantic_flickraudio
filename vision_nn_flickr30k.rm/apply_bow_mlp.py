@@ -108,11 +108,12 @@ def apply_model(model_dir, subset, batch_size=1, config=None):
         sigmoid_output_dict = {}
         n_outputs = 0
         print "Passing batches through model"
-        for cur_feed in apply_batch_iterator:
-            cur_output = session.run(mlp, feed_dict={x: cur_feed})
-            for i in xrange(cur_output.shape[0]):
-                sigmoid_output_dict[image_keys.pop(0)] = cur_output[i, :]
-                n_outputs += 1
+        for j in range(1000):
+            for cur_feed in apply_batch_iterator:
+                cur_output = session.run(mlp, feed_dict={x: cur_feed})
+                for i in xrange(cur_output.shape[0]):
+                    sigmoid_output_dict[image_keys.pop(0)] = cur_output[i, :]
+                    n_outputs += 1
         print "Processed {} inputs out of {}".format(n_outputs, input_x.shape[0])
 
     print datetime.now()

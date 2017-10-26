@@ -22,7 +22,7 @@ import sklearn.metrics as metrics
 import sys
 
 # keywords_fn = path.join("..", "data", "keywords.4.txt")  # Interspeech 2017
-keywords_fn = path.join("..", "data", "keywords.6.txt")
+keywords_fn = path.join("..", "data", "keywords.8.txt")
 
 
 #-----------------------------------------------------------------------------#
@@ -63,7 +63,7 @@ def calculate_eer(y_true, y_score):
 
 
 def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict,
-        analyze=False):
+        analyze=False, captions_dict=None):
     """Return P@10, P@N and EER."""
     
     keywords = sorted(keyword_counts)
@@ -74,6 +74,9 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict,
     keyword_sigmoid_mat = np.zeros((len(utterances), len(keywords)))
     for i_utt, utt in enumerate(utterances):
         keyword_sigmoid_mat[i_utt, :] = sigmoid_dict[utt][keyword_ids]
+
+    # # Temp
+    # outputs = []
 
     # Keyword spotting evaluation
     p_at_10 = []
@@ -112,29 +115,49 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict,
             print "Current P@10: {:.4f}".format(cur_p_at_10)
             print "Current P@N: {:.4f}".format(cur_p_at_n)
             print "Current EER: {:.4f}".format(cur_eer)
-            print "Top 10 utterances: ", utt_order[:10]
-            if cur_p_at_10 != 1:
-                # print "Incorrect in top 10:", [
-                #     utt for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                #     ]
-                print "Incorrect in top 10:"
-                if utt.count("_") == 3:
-                    print "\n".join([
-                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                        + utt[4:] + ".wav {}".format(label_dict[utt]) for i,
-                        utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                        ])
-                elif utt.count("_") == 2:
-                    print "\n".join([
-                        "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
-                        + utt + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
-                        ])
+            # print "Top 10 utterances: ", utt_order[:10]
+            print "Top 10 utterances:"
+            for i_utt, utt in enumerate(utt_order[:10]):
+                print "{}: {}".format(utt, " ".join(captions_dict[utt])),
+                if y_true[i_utt] == 0:
+                    print "*"
                 else:
-                    assert False
+                    print
+
+                # # Temp
+                # if i_utt == 0:
+                #     if y_true[i_utt] == 0:
+                #         outputs.append(keyword + " & " + " ".join(captions_dict[utt]) + " $*$ \\\\")
+                #     else:
+                #         outputs.append(keyword + " & " + " ".join(captions_dict[utt]) + " \\\\")
+
+
+            # if cur_p_at_10 != 1:
+            #     # print "Incorrect in top 10:", [
+            #     #     utt for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+            #     #     ]
+            #     print "Incorrect in top 10:"
+            #     if utt.count("_") == 3:
+            #         print "\n".join([
+            #             "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+            #             + utt[4:] + ".wav {}".format(label_dict[utt]) for i,
+            #             utt in enumerate(utt_order[:10]) if y_true[i] == 0
+            #             ])
+            #     elif utt.count("_") == 2:
+            #         print "\n".join([
+            #             "/share/data/lang/users/kamperh/flickr_multimod/flickr_audio/wavs/"
+            #             + utt + ".wav" for i, utt in enumerate(utt_order[:10]) if y_true[i] == 0
+            #             ])
+            #     else:
+            #         assert False
 
     if analyze:
         print "-"*79
         print
+
+    # # Temp
+    # for bla in outputs:
+    #     print bla
 
     # Average
     p_at_10 = np.mean(p_at_10)
@@ -150,6 +173,13 @@ def eval_keyword_spotting(sigmoid_dict, word_to_id, keyword_counts, label_dict,
 
 def main():
     args = check_argv()
+
+    # Load transcriptions
+    if args.analyze:
+        from get_captions import captions_fn, get_captions_dict
+        captions_dict = get_captions_dict(captions_fn)
+    else:
+        captions_dict = None
 
     # Load the model options to obtain dataset information
     options_dict_fn = path.join(args.model_dir, "options_dict.pkl")
@@ -199,7 +229,8 @@ def main():
 
     print "Performing evaluation"
     p_at_10, p_at_n, eer = eval_keyword_spotting(
-        sigmoid_output_dict, word_to_id, keyword_counts, true_dict_subset, args.analyze
+        sigmoid_output_dict, word_to_id, keyword_counts, true_dict_subset, args.analyze,
+        captions_dict
         )
 
     print

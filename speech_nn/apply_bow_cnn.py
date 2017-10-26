@@ -33,7 +33,7 @@ def check_argv():
     parser.add_argument("model_dir", type=str, help="model directory")
     parser.add_argument(
         "subset", type=str, help="subset to apply model to", choices=["train",
-        "dev", "test", "dev_queries", "dev_queries_all"]
+        "dev", "test", "dev_queries", "dev_queries_all", "dev_search"]
         )
     parser.add_argument(
         "--layer", type=str, help="layer to take output from (default: %(default)s)",

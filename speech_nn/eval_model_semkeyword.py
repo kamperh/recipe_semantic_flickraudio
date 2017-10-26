@@ -39,6 +39,11 @@ def check_argv():
     parser = argparse.ArgumentParser(
         description=__doc__.strip().split("\n")[0], add_help=False
         )
+    parser.add_argument(
+        "--analyze",
+        help="print an analysis of the evaluation output for each keyword",
+        action="store_true"
+        )
     parser.add_argument("model_dir", type=str, help="model directory")
     if len(sys.argv) == 1:
         parser.print_help()
@@ -58,7 +63,8 @@ def calculate_eer(y_true, y_score):
     return eer
 
 
-def eval_keyword_spotting(prediction_dict, true_dict, keyword_counts):
+def eval_keyword_spotting(prediction_dict, true_dict, keyword_counts,
+        analyze=False, captions_dict=None):
     """Return P@10, P@N and EER."""
     
     keywords = sorted(keyword_counts)
@@ -71,6 +77,9 @@ def eval_keyword_spotting(prediction_dict, true_dict, keyword_counts):
             prediction_vectors[i_utt, i_keyword] = prediction_dict[utt][
                 keyword
                 ]
+
+    # # Temp
+    # outputs = []
 
     # Keyword spotting evaluation
     p_at_10 = []
@@ -100,6 +109,37 @@ def eval_keyword_spotting(prediction_dict, true_dict, keyword_counts):
         # P@N
         cur_p_at_n = float(sum(y_true[:sum(y_true)]))/sum(y_true)
         p_at_n.append(cur_p_at_n)
+
+        if analyze:
+            print("-"*79)
+            print("Keyword:", keyword)
+            print("Current P@10: {:.4f}".format(cur_p_at_10))
+            print("Current P@N: {:.4f}".format(cur_p_at_n))
+            print("Current EER: {:.4f}".format(cur_eer))
+            print("Top 10 utterances:")
+            for i_utt, utt in enumerate(utt_order[:10]):
+                print(
+                    "{}: {}".format(utt, " ".join(captions_dict[utt])), end=""
+                    )
+                if y_true[i_utt] == 0:
+                    print(" *")
+                else:
+                    print()
+
+                # # Temp
+                # if i_utt == 0:
+                #     if y_true[i_utt] == 0:
+                #         outputs.append(keyword + " & " + " ".join(captions_dict[utt]) + " $*$ \\\\")
+                #     else:
+                #         outputs.append(keyword + " & " + " ".join(captions_dict[utt]) + " \\\\")
+
+    if analyze:
+        print("-"*79)
+        print()
+
+    # # Temp
+    # for bla in outputs:
+    #     print(bla)
 
     # Average
     p_at_10 = np.mean(p_at_10)
@@ -143,6 +183,53 @@ def get_average_precision(prediction_dict, true_dict, keywords,
     
     return ap
 
+
+def get_mean_average_precision(prediction_dict, true_dict, keywords,
+        show_plot=False):
+
+    keywords = sorted(keywords)
+    utt_keys = sorted(prediction_dict)
+
+    average_precisions = []
+    for keyword in keywords:
+
+        # Prediction and true vectors
+        prediction_vectors = np.zeros(len(utt_keys))
+        true_vectors = np.zeros(len(utt_keys))
+        for i_utt, utt in enumerate(utt_keys):
+            # The addition of random noise helps if there are only one
+            # threshold, in which case the AP is always very close to 0.5,
+            # independent of well the model does.
+            prediction_vectors[i_utt] = (
+                prediction_dict[utt][keyword] + np.random.normal(0, 0.0001, 1)
+                )
+            if keyword in true_dict[utt]:
+                true_vectors[i_utt] = 1
+            # print(true_vectors[i_utt], prediction_vectors[i_utt])
+
+        # Average precision
+        ap = metrics.average_precision_score(
+            true_vectors, prediction_vectors, average="micro"
+            )
+        average_precisions.append(ap)
+
+        # print(keyword, ap)
+        # import matplotlib.pyplot as plt
+        # precisions, recalls, _ = metrics.precision_recall_curve(
+        #     true_vectors.ravel(), prediction_vectors.ravel()
+        #     )
+        # plt.plot(recalls, precisions)
+        # plt.xlabel("Recall")
+        # plt.ylabel("Precision")
+        # plt.show()
+        # assert False
+    
+    # Mean average precision
+    mAP = np.mean(average_precisions)
+    
+    return mAP
+
+
 def eval_semkeyword_exact_sem_counts(prediction_dict, keywords,
         exact_label_dict, sem_label_dict):
     """
@@ -159,6 +246,8 @@ def eval_semkeyword_exact_sem_counts(prediction_dict, keywords,
             prediction_vectors[i_utt, i_keyword] = prediction_dict[utt][keyword]
 
     precision_counts_dict = {}  # [n_total, n_exact, n_sem]
+    n_true_total_sem = 0
+    n_true_total_exact = 0
     for i_keyword, keyword in enumerate(keywords):
 
         # Rank
@@ -187,9 +276,12 @@ def eval_semkeyword_exact_sem_counts(prediction_dict, keywords,
         n_exact = sum(y_exact[:sum(y_true)])
         n_sem = sum(y_sem[:sum(y_true)])
 
+        n_true_total_sem += sum(y_sem)
+        n_true_total_exact += sum(y_exact)
+
         precision_counts_dict[keyword] = (n_total, n_exact, n_sem)
 
-    return precision_counts_dict
+    return precision_counts_dict, n_true_total_sem, n_true_total_exact
 
 
 def get_spearmanr(prediction_dict, rating_dict, keywords):
@@ -221,6 +313,17 @@ def main():
     args = check_argv()
 
     subset = "test"
+
+    # Load transcriptions
+    if args.analyze:
+        from get_captions import captions_fn, get_captions_dict
+        captions_dict = get_captions_dict(captions_fn)
+        tmp_dict = {}
+        for utt_key in captions_dict:
+            tmp_dict[utt_key[4:]] = captions_dict[utt_key]
+        captions_dict = tmp_dict
+    else:
+        captions_dict = None
 
     # Read keywords
     # keywords_fn = path.join("..", "4.extra_keywords", "data", "keywords.8.txt")
@@ -310,6 +413,9 @@ def main():
     average_precision = get_average_precision(
         similarity_dict, exact_keywords_dict, keywords
         )
+    mean_average_precision = get_mean_average_precision(
+        similarity_dict, exact_keywords_dict, keywords
+        )
 
     print()
     print("-"*79)
@@ -318,12 +424,17 @@ def main():
     print("Average P@N: {:.4f}".format(p_at_n))
     print("Average EER: {:.4f}".format(eer))
     print("Average precision: {:.4f}".format(average_precision))
+    print("Mean average precision: {:.4f}".format(mean_average_precision))
 
     # Evaluate semantic keyword spotting
     p_at_10, p_at_n, eer = eval_keyword_spotting(
-        similarity_dict, semkeywords_dict, semkeywords_counts
+        similarity_dict, semkeywords_dict, semkeywords_counts, args.analyze,
+        captions_dict
         )
     average_precision = get_average_precision(
+        similarity_dict, semkeywords_dict, keywords
+        )
+    mean_average_precision = get_mean_average_precision(
         similarity_dict, semkeywords_dict, keywords
         )
     spearmans_rho = get_spearmanr(
@@ -336,11 +447,13 @@ def main():
     print("Average P@N: {:.4f}".format(p_at_n))
     print("Average EER: {:.4f}".format(eer))
     print("Average precision: {:.4f}".format(average_precision))
+    print("Mean average precision: {:.4f}".format(mean_average_precision))
     print("Spearman's rho: {:.4f}".format(spearmans_rho[0]))
 
     # Breakdown separating out exact and semantic matches
-    keyword_precision_counts = eval_semkeyword_exact_sem_counts(
-        similarity_dict, keywords, exact_keywords_dict, semkeywords_dict
+    keyword_precision_counts, n_true_total_sem, n_true_total_exact = (
+        eval_semkeyword_exact_sem_counts(similarity_dict, keywords,
+        exact_keywords_dict, semkeywords_dict )
         )
     p_at_n_accum = 0
     n_total_accum = 0
@@ -371,6 +484,7 @@ def main():
         "Average P@N* semantic: {:.4f}".format(float(n_sem_accum) /
         n_total_accum)
         )
+    # print(n_total_accum, n_true_total_sem, n_true_total_exact)
     print("-"*79)
 
 

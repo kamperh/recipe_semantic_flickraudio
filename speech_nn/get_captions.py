@@ -17,16 +17,20 @@ import cPickle as pickle
 captions_fn = path.join("..", "kaldi_features", "data", "full_vad", "text")
 data_dir = "data"
 
-
-def main():
-
-    print datetime.now()
+def get_captions_dict(captions_fn):
     print "Reading:", captions_fn
     captions_dict = {}
     with open(captions_fn) as f:
         for line in f:
             line = line.strip().split()
             captions_dict[line[0]] = [i for i in line[1:] if "<" not in i and not "'" in i]
+    return captions_dict
+
+
+def main():
+
+    print datetime.now()
+    captions_dict = get_captions_dict(captions_fn)
     print datetime.now()
 
     print "Filtering out stop words"

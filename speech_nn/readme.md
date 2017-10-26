@@ -305,6 +305,95 @@ To pass these queries through a given model, run:
     ./apply_bow_cnn.py models/train_visionspeech_cnn/332147c538 dev_queries_all
 
 
+Files for Okko
+--------------
+Vision output:
+
+    cp ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz \
+        ../../share/okko/
+    cp ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/word_to_id.pkl \
+        ../../share/okko/
+
+A snippet of ipython code that shows how to deal with this:
+
+    In [1]: import pickle
+
+    In [2]: import numpy as np
+
+    # Each item in the dictionary below gives the output of the vision system
+    # for the corresponding image
+    In [3]: features_dict = np.load("sigmoid_output_dict.flickr8k.all.npz")
+
+    In [4]: with open("word_to_id.pkl", "rb") as f:
+       ...:     word_to_id = pickle.load(f)
+       ...:     
+
+    # The dictionary gives the mapping of dimensions to image labels for each
+    # of the dimensions for the output vectors in features_dict
+    In [5]: word_to_id["man"]
+    Out[5]: 0
+
+    In [6]: word_to_id["skateboard"]
+    Out[6]: 73
+
+    # This is the score (predicted prob) for the word "skateboard" for the
+    # image 2844641033_dab3715a99
+    In [8]: features_dict["2844641033_dab3715a99"][73]
+    Out[8]: 2.5031889e-06
+
+    # This is the score (predicted prob) for the word "man" for the image
+    # 2844641033_dab3715a99
+    In [9]: features_dict["2844641033_dab3715a99"][0]
+    Out[9]: 0.30007029
+
+
+Files for Ari
+-------------
+To copy the files for Ari, run the following:
+
+    mkdir ../../../stellenbosch/2017_ari/
+    cp ../kaldi_features/data/full_vad/text ../../../stellenbosch/2017_ari/
+    cp models/train_visionspeech_cnn/332147c538/sigmoid_output_dict.dev_queries.pkl \
+        ../../../stellenbosch/2017_ari/332147c538.sigmoid_output_dict.dev_queries.pkl
+    cp models/train_visionspeech_cnn/332147c538/sigmoid_output_dict.dev_search.pkl \
+        ../../../stellenbosch/2017_ari/332147c538.sigmoid_output_dict.dev_search.pkl
+    cp models/train_visionspeech_cnn/332147c538/sigmoid_final_feedforward_dict.dev_queries.pkl \
+        ../../../stellenbosch/2017_ari/332147c538.sigmoid_final_feedforward_dict.dev_queries.pkl
+    cp models/train_visionspeech_cnn/332147c538/sigmoid_final_feedforward_dict.dev_search.pkl \
+        ../../../stellenbosch/2017_ari/332147c538.sigmoid_final_feedforward_dict.dev_search.pkl
+    cp models/train_visionspeech_cnn/18ba6618ad/sigmoid_final_feedforward_dict.dev_queries.pkl \
+        ../../../stellenbosch/2017_ari/18ba6618ad.sigmoid_final_feedforward_dict.dev_queries.pkl
+    cp models/train_visionspeech_cnn/18ba6618ad/sigmoid_final_feedforward_dict.dev_search.pkl \
+        ../../../stellenbosch/2017_ari/18ba6618ad.sigmoid_final_feedforward_dict.dev_search.pkl
+
+    cp models/train_visionspeech_cnn/332147c538/word_to_id.pkl \
+        ../../../stellenbosch/2017_ari/332147c538.word_to_id.pkl
+    cp models/train_visionspeech_cnn/18ba6618ad/word_to_id.pkl \
+        ../../../stellenbosch/2017_ari/18ba6618ad.word_to_id.pkl
+
+    cp models/train_bow_cnn/7482d6f5f5/sigmoid_output_dict.dev_queries.pkl \
+        ../../../stellenbosch/2017_ari/7482d6f5f5.sigmoid_output_dict.dev_queries.pkl
+    cp models/train_bow_cnn/7482d6f5f5/sigmoid_output_dict.dev_search.pkl \
+        ../../../stellenbosch/2017_ari/7482d6f5f5.sigmoid_output_dict.dev_search.pkl
+    cp models/train_bow_cnn/7482d6f5f5/word_to_id.pkl \
+        ../../../stellenbosch/2017_ari/7482d6f5f5.word_to_id.pkl
+
+    7482d6f5f5.sigmoid_output_dict.dev_queries.pkl
+    7482d6f5f5.sigmoid_output_dict.dev_search.pkl
+    7482d6f5f5.word_to_id.pkl
+
+
+Example of loading dictionary:
+
+    import cPickle as pickle
+    fn = "18ba6618ad.sigmoid_final_feedforward_dict.dev_queries.pkl"
+    with open(fn, "rb") as f:
+        queries_dict = pickle.load()
+    print(queries_dict.keys()[0])
+    print(queries_dict[queries_dict.keys()[0]])
+
+
+
 Model notebook
 --------------
 - OracleSpeechCNN: models/train_bow_cnn/4f8af91591
