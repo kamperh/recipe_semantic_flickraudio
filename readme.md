@@ -1,19 +1,23 @@
-Multimodal Modelling of Flickr Vision and Speech Data
-=====================================================
+Models for Semantic Keyword Spotting on Flickr Audio Captions
+=============================================================
 
 Overview
 --------
-To-do: update the text below to point to new work, but keep reference to
-previous work.
+This is a recipe for training a model on images paired with untranscribed
+speech, and using this model for semantic keyword spotting. The model and
+this new task are described in the following publications:
 
-This is a recipe for grounding untranscribed speech using paired images.
-Details are given in [Kamper et al., 2017](https://arxiv.org/abs/1703.08136):
-
+- H. Kamper, G. Shakhnarovich, and K. Livescu, "Semantic keyword spotting by
+  learning from images and speech," *arXiv preprint arXiv:1710.01949*, 2017.
+  [[arXiv](https://arxiv.org/abs/1710.01949)]
 - H. Kamper, S. Settle, G. Shakhnarovich, and K. Livescu, "Visually grounded
-  learning of keyword prediction from untranscribed speech," *arXiv preprint
-  arXiv:1703.08136*, 2017.
+  learning of keyword prediction from untranscribed speech," in *Proc.
+  Interspeech*, 2017. [[arXiv](https://arxiv.org/abs/1706.03818)]
 
-Please cite this paper if you use this code.
+Please cite these papers if you use the code.
+
+A related [recipe](https://github.com/kamperh/recipe_vision_speech_flickr) is
+also available, but this one is the current up to date version.
 
 
 Disclaimer
@@ -32,14 +36,13 @@ The following datasets need to be obtained:
 - [Flickr8k images](http://nlp.cs.illinois.edu/HockenmaierGroup/Framing_Image_Description/Flickr8k_Dataset.zip)
 - [Flickr8k text](http://nlp.cs.illinois.edu/HockenmaierGroup/Framing_Image_Description/Flickr8k_Dataset.zip)
 - [Flickr30k](http://shannon.cs.illinois.edu/DenotationGraph/)
+- [MSCOCO](http://cocodataset.org/#download)
 
-Flickr30k is used for training a vision tagging system. The Flickr8k audio and
-image datasets gives paired images with spoken captions; we do not use the
-labels from either of these. The Flickr8k text corpus is purely for reference.
-The Flickr8k dataset can also be browsed directly
+MSCOCO and Flickr30k is used for training a vision tagging system. The Flickr8k
+audio and image datasets gives paired images with spoken captions; we do not
+use the labels from either of these. The Flickr8k text corpus is purely for
+reference. The Flickr8k dataset can also be browsed directly
 [here](http://nlp.cs.illinois.edu/HockenmaierGroup/8k-pictures.html).
-
-To-do: Add MSCOCO above.
 
 
 Directory structure
@@ -109,3 +112,9 @@ Contributors
 - Shane Settle
 - [Karen Livescu](http://ttic.uchicago.edu/~klivescu/)
 - [Greg Shakhnarovich](http://ttic.uchicago.edu/~gregory/)
+
+
+License
+-------
+The code is distributed under the Creative Commons Attribution-ShareAlike
+license ([CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)).
