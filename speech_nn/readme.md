@@ -6,7 +6,7 @@ Overview
 Most of the results in [Kamper et al., IS'17](https://arxiv.org/abs/1703.08136)
 and [Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) are generated
 here. Apart from the results given below, more detailed analysis of the outputs
-that I obtained (specifically in [Kamper et al., IS'17]) are also given in
+that we obtained (specifically in [Kamper et al., IS'17]) are also given in
 `doc/results.md`.
 
 
@@ -229,8 +229,9 @@ utterances, run:
 
     ./eval_model_semkeyword.py models/train_visionspeech_cnn/332147c538
 
-On the test set, this model achieves the following scores, as in Tables 3 and 4
-of [Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
+For semantic keyword spotting on the test set, this model achieves the
+following scores, as in Tables 3 and 4 of
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
 VisionSpeechCNN:
 
     Exact keyword spotting:
@@ -254,9 +255,36 @@ VisionSpeechCNN:
     Average P@N* exact: 0.2227
     Average P@N* semantic: 0.2528
 
-The other baseline and topline models in
-[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) are evaluated in a
-similar manner.
+To run semantic and exact keyword spotting on the 1000 labelled test
+utterances using the supervised BoW model, run:
+
+    ./eval_model_semkeyword.py models/train_bow_cnn/7482d6f5f5/
+
+For semantic keyword spotting on the test set, this model achieves the
+following scores, as in Tables 3 and 4 of
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
+SupervisedBoWCNN:
+
+    Exact keyword spotting:
+    Average P@10: 0.8493
+    Average P@N: 0.7466
+    Average EER: 0.0564
+    Average precision: 0.8728
+    Mean average precision: 0.8091
+
+    Semantic keyword spotting:
+    Average P@10: 0.8806
+    Average P@N: 0.5034
+    Average EER: 0.2378
+    Average precision: 0.5128
+    Mean average precision: 0.5425
+    Spearman's rho: 0.2192
+
+    Breakdown of exact and semantic matches
+    Average P@N: 0.5034
+    Average P@N* overall: 0.5004
+    Average P@N* exact: 0.3835
+    Average P@N* semantic: 0.1169
 
 
 Unigram baseline
@@ -281,10 +309,35 @@ baseline:
     F-score: 13.1269%
     Average precision: 6.8280%
 
+For semantic keyword spotting on the test set, this model achieves the
+following scores, as in Table 3 of
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
+TextPrior:
+
+    Exact keyword spotting:
+    Average P@10: 0.0284
+    Average P@N: 0.0342
+    Average EER: 0.5000
+    Average precision: 0.0615
+    Mean average precision: 0.0345
+
+    Semantic keyword spotting:
+    Average P@10: 0.0612
+    Average P@N: 0.0696
+    Average EER: 0.5000
+    Average precision: 0.1044
+    Mean average precision: 0.0713
+    Spearman's rho: 0.1085
+
+    Breakdown of exact and semantic matches
+    Average P@N: 0.0696
+    Average P@N* overall: 0.1206
+    Average P@N* exact: 0.0477
+    Average P@N* semantic: 0.0729
 
 
-Vision system baseline
-----------------------
+Vision system baselines
+-----------------------
 Every utterance is encoded as its visual BoW vector (so the five spoken
 captions will share the same output). Run:
 
@@ -311,6 +364,31 @@ captions will share the same output). Run:
     ./eval_precision_recall.py models/vision_nn_baseline_891a3a3533 test
     ./eval_model_semkeyword.py models/vision_nn_baseline_891a3a3533
 
+For semantic keyword spotting on the test set, this model achieves the
+following scores, as in Tables 3 and 4 of
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under VisionCNN:
+    
+    Exact keyword spotting:
+    Average P@10: 0.3104
+    Average P@N: 0.2620
+    Average EER: 0.2206
+    Average precision: 0.2227
+    Mean average precision: 0.2440
+    
+    Semantic keyword spotting:
+    Average P@10: 0.5418
+    Average P@N: 0.3893
+    Average EER: 0.2278
+    Average precision: 0.3736
+    Mean average precision: 0.3763
+    Spearman's rho: 0.3377
+    
+    Breakdown of exact and semantic matches
+    Average P@N: 0.3893
+    Average P@N* overall: 0.4470
+    Average P@N* exact: 0.1923
+    Average P@N* semantic: 0.2546
+
 Every utterance is encoded as the average visual BoW vector (so all captions).
 Run to get this visual tag prior:
 
@@ -321,7 +399,8 @@ Run to get this visual tag prior:
         test
     ./eval_model_semkeyword.py models/vision_tag_prior_891a3a3533
 
-On the test set, this model achieves the following scores, as in Tables 3 of
+For semantic keyword spotting on the test set, this model achieves the
+following scores, as in Table 3 of
 [Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
 VisionTagPrior:
     
