@@ -17,8 +17,23 @@ this new task are described in the following publications:
 
 Please cite these papers if you use the code.
 
+
+Related repositories and datasets
+---------------------------------
 A related [recipe](https://github.com/kamperh/recipe_vision_speech_flickr) is
 also available, but this one is most recent recipe.
+
+The semantic labels used here are also available separately in the
+[semantic_flickraudio](https://github.com/kamperh/semantic_flickraudio)
+repository. Here we directly use processed versions of this dataset: all the
+pickled files in `data/` starting with `06-16-23h59` were obtained directly
+from the semantic annotations.
+
+The output of the multilabel visual classifier described below (also see
+[vision_nn_1k/readme.md](vision_nn_1k/readme.md)) can be downloaded directly
+[here](https://github.com/JSALT-Rosetta/flickr/blob/master/flickr8k.tags.all.txt.zip).
+We released these visual tags as part of the
+[JSALT Rosetta](https://github.com/JSALT-Rosetta/flickr) project.
 
 
 Disclaimer
@@ -88,7 +103,7 @@ Dependencies
 ------------
 Standalone packages:
 
-- [Python](https://www.python.org/)
+- [Python](https://www.python.org/): I used Python 2.7.
 - [NumPy](http://www.numpy.org/) and [SciPy](http://www.scipy.org/).
 - [TensorFlow](https://www.tensorflow.org/): Required by the `tflego`
   repository below. I used TensorFlow v0.10.
