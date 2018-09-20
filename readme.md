@@ -1,5 +1,5 @@
-Models for Semantic Keyword Spotting on Flickr Audio Captions
-=============================================================
+Semantic Speech Retrieval using the Flickr Audio Captions Corpus
+================================================================
 
 Overview
 --------
@@ -7,9 +7,9 @@ This is a recipe for training a model on images paired with untranscribed
 speech, and using this model for semantic keyword spotting. The model and
 this new task are described in the following publications:
 
-- H. Kamper, G. Shakhnarovich, and K. Livescu, "Semantic keyword spotting by
-  learning from images and speech," in press *IEEE/ACM Transactions on Audio,
-  Speech and Language Processing*, 2018.
+- H. Kamper, G. Shakhnarovich, and K. Livescu, "Semantic speech retrieval with
+  a  visually grounded model of untranscribed speech," in press *IEEE/ACM
+  Transactions on Audio, Speech and Language Processing*, 2018.
   [[arXiv](https://arxiv.org/abs/1710.01949)]
 - H. Kamper, S. Settle, G. Shakhnarovich, and K. Livescu, "Visually grounded
   learning of keyword prediction from untranscribed speech," in *Proc.
