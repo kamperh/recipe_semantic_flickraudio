@@ -3,9 +3,11 @@ Visually Grounded Speech Neural Networks
 
 Overview
 --------
-Most of the results in [Kamper et al., 2017](https://arxiv.org/abs/1703.08136)
-are generated here. Apart from the results given below, more detailed analysis
-of the outputs that I obtained are also given in `doc/results.md`.
+Most of the results in [Kamper et al., IS'17](https://arxiv.org/abs/1703.08136)
+and [Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) are generated
+here. Apart from the results given below, more detailed analysis of the outputs
+that I obtained (specifically in [Kamper et al., IS'17]) are also given in
+`doc/results.md`.
 
 
 Data preparation
@@ -48,7 +50,7 @@ adjusted by passing the `--sigmoid_threshold` option to
 `eval_precision_recall.py`.
 
 On the test set, this model achieves the following scores, as in Table 1 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under OracleSpeechCNN:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under OracleSpeechCNN:
 
     Sigmoid threshold: 0.40
     No. predictions: 19108
@@ -96,7 +98,7 @@ Train and evaluate a bag-of-words CNN with a PSyC architecture:
     ./eval_precision_recall.py models/train_psyc/246f3f7f69 test
 
 On the test set, this model achieves the following scores, as in Table 1 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under OracleSpeechPSC:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under OracleSpeechPSC:
 
     Sigmoid threshold: 0.40
     No. predictions: 24217
@@ -127,7 +129,7 @@ Train and evaluate a visually grounded bag-of-words CNN:
     ./eval_precision_recall.py models/train_visionspeech_cnn/989f00f30a test
 
 On the test set, this model achieves the following scores, as in Table 1 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under OracleSpeechPSC:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under OracleSpeechPSC:
 
     Sigmoid threshold: 0.40
     No. predictions: 20751
@@ -139,7 +141,7 @@ On the test set, this model achieves the following scores, as in Table 1 of
 
 Running `eval_precision_recall.py` with the `--analyze` argument also provides
 the output of the system, which was used to produce Table 2 in
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136). A figure similar to
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136). A figure similar to
 Figure 3 can be produced by running:
 
     ./eval_precision_recall.py --plot --analyze_confusions \
@@ -169,7 +171,7 @@ architecture:
     ./eval_precision_recall.py models/train_visionspeech_psyc/d5cb9be08b dev
 
 On the test set, this model achieves the following scores, as in Table 1 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under VisionSpeechPSC:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under VisionSpeechPSC:
 
     Sigmoid threshold: 0.40
     No. predictions: 14900
@@ -203,7 +205,7 @@ keyword spotting for any of the above models using this keyword set, run:
     ./eval_keyword_spotting.py models/train_visionspeech_cnn/989f00f30a test
 
 On the test set, this model achieves the following scores, as in Table 3 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under VisionSpeechPSC:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under VisionSpeechPSC:
     
     Average P@10: 0.5450
     Average P@N: 0.3312
@@ -216,16 +218,45 @@ to choose the set of keywords if you want to use a different keyword set.
 Semantic keyword spotting
 -------------------------
 Evaluation here is based on the semantic keyword labels collected using
-Mechanical Turk for a set of 49 keywords give in `../data/keywords.6.txt`. To
+Mechanical Turk for a set of 49 keywords give in `../data/keywords.8.txt`. To
 do an evaluation of exact matches, run:
 
-    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.6.txt \
+    ./eval_keyword_spotting.py --keywords_fn ../data/keywords.8.txt \
         models/train_visionspeech_cnn/989f00f30a dev
 
 To run semantic and exact keyword spotting on the 1000 labelled test
 utterances, run:
 
     ./eval_model_semkeyword.py models/train_visionspeech_cnn/332147c538
+
+On the test set, this model achieves the following scores, as in Tables 3 and 4
+of [Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
+VisionSpeechCNN:
+
+    Exact keyword spotting:
+    Average P@10: 0.3851
+    Average P@N: 0.3082
+    Average EER: 0.1964
+    Average precision: 0.2699
+    Mean average precision: 0.3084
+
+    Semantic keyword spotting:
+    Average P@10: 0.5881
+    Average P@N: 0.3971
+    Average EER: 0.2389
+    Average precision: 0.3943
+    Mean average precision: 0.4075
+    Spearman's rho: 0.3236
+
+    Breakdown of exact and semantic matches
+    Average P@N: 0.3971
+    Average P@N* overall: 0.4754
+    Average P@N* exact: 0.2227
+    Average P@N* semantic: 0.2528
+
+The other baseline and topline models in
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) are evaluated in a
+similar manner.
 
 
 Unigram baseline
@@ -239,7 +270,8 @@ Get unigram baseline and evaluate:
     ./eval_model_semkeyword.py models/unigram_baseline/
 
 On the test set, this model achieves the following scores, as in Table 1 of
-[Kamper et al., 2017](https://arxiv.org/abs/1703.08136) under unigram baseline:
+[Kamper et al., IS'17](https://arxiv.org/abs/1703.08136) under unigram
+baseline:
 
     Sigmoid threshold: 0.40
     No. predictions: 34587
@@ -248,6 +280,7 @@ On the test set, this model achieves the following scores, as in Table 1 of
     Recall: 4214 / 29617 = 14.2283%
     F-score: 13.1269%
     Average precision: 6.8280%
+
 
 
 Vision system baseline
@@ -288,116 +321,27 @@ Run to get this visual tag prior:
         test
     ./eval_model_semkeyword.py models/vision_tag_prior_891a3a3533
 
-
-Query vizualization
--------------------
-To split a particular subset in to queries and a search collection, run:
-
-    ./get_queries_search.py mfcc_cmvn_dd_vad dev
-
-Note that `for utt_key in sorted(query_utt_keys)` and subsequent lines can
-be switched to obtain more terms; this was done to get the `dev_queries_all`
-options below.
-
-To pass these queries through a given model, run:
-
-    ./apply_bow_cnn.py models/train_bow_cnn/7482d6f5f5 dev_queries_all
-    ./apply_bow_cnn.py models/train_visionspeech_cnn/332147c538 dev_queries_all
-
-
-Files for Okko
---------------
-Vision output:
-
-    cp ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/sigmoid_output_dict.flickr8k.all.npz \
-        ../../share/okko/
-    cp ../vision_nn_1k/models/mscoco+flickr30k/train_bow_mlp/891a3a3533/word_to_id.pkl \
-        ../../share/okko/
-
-A snippet of ipython code that shows how to deal with this:
-
-    In [1]: import pickle
-
-    In [2]: import numpy as np
-
-    # Each item in the dictionary below gives the output of the vision system
-    # for the corresponding image
-    In [3]: features_dict = np.load("sigmoid_output_dict.flickr8k.all.npz")
-
-    In [4]: with open("word_to_id.pkl", "rb") as f:
-       ...:     word_to_id = pickle.load(f)
-       ...:     
-
-    # The dictionary gives the mapping of dimensions to image labels for each
-    # of the dimensions for the output vectors in features_dict
-    In [5]: word_to_id["man"]
-    Out[5]: 0
-
-    In [6]: word_to_id["skateboard"]
-    Out[6]: 73
-
-    # This is the score (predicted prob) for the word "skateboard" for the
-    # image 2844641033_dab3715a99
-    In [8]: features_dict["2844641033_dab3715a99"][73]
-    Out[8]: 2.5031889e-06
-
-    # This is the score (predicted prob) for the word "man" for the image
-    # 2844641033_dab3715a99
-    In [9]: features_dict["2844641033_dab3715a99"][0]
-    Out[9]: 0.30007029
-
-
-Files for Ari
--------------
-To copy the files for Ari, run the following:
-
-    mkdir ../../../stellenbosch/2017_ari/
-    cp ../kaldi_features/data/full_vad/text ../../../stellenbosch/2017_ari/
-    cp models/train_visionspeech_cnn/332147c538/sigmoid_output_dict.dev_queries.pkl \
-        ../../../stellenbosch/2017_ari/332147c538.sigmoid_output_dict.dev_queries.pkl
-    cp models/train_visionspeech_cnn/332147c538/sigmoid_output_dict.dev_search.pkl \
-        ../../../stellenbosch/2017_ari/332147c538.sigmoid_output_dict.dev_search.pkl
-    cp models/train_visionspeech_cnn/332147c538/sigmoid_final_feedforward_dict.dev_queries.pkl \
-        ../../../stellenbosch/2017_ari/332147c538.sigmoid_final_feedforward_dict.dev_queries.pkl
-    cp models/train_visionspeech_cnn/332147c538/sigmoid_final_feedforward_dict.dev_search.pkl \
-        ../../../stellenbosch/2017_ari/332147c538.sigmoid_final_feedforward_dict.dev_search.pkl
-    cp models/train_visionspeech_cnn/18ba6618ad/sigmoid_final_feedforward_dict.dev_queries.pkl \
-        ../../../stellenbosch/2017_ari/18ba6618ad.sigmoid_final_feedforward_dict.dev_queries.pkl
-    cp models/train_visionspeech_cnn/18ba6618ad/sigmoid_final_feedforward_dict.dev_search.pkl \
-        ../../../stellenbosch/2017_ari/18ba6618ad.sigmoid_final_feedforward_dict.dev_search.pkl
-
-    cp models/train_visionspeech_cnn/332147c538/word_to_id.pkl \
-        ../../../stellenbosch/2017_ari/332147c538.word_to_id.pkl
-    cp models/train_visionspeech_cnn/18ba6618ad/word_to_id.pkl \
-        ../../../stellenbosch/2017_ari/18ba6618ad.word_to_id.pkl
-
-    cp models/train_bow_cnn/7482d6f5f5/sigmoid_output_dict.dev_queries.pkl \
-        ../../../stellenbosch/2017_ari/7482d6f5f5.sigmoid_output_dict.dev_queries.pkl
-    cp models/train_bow_cnn/7482d6f5f5/sigmoid_output_dict.dev_search.pkl \
-        ../../../stellenbosch/2017_ari/7482d6f5f5.sigmoid_output_dict.dev_search.pkl
-    cp models/train_bow_cnn/7482d6f5f5/word_to_id.pkl \
-        ../../../stellenbosch/2017_ari/7482d6f5f5.word_to_id.pkl
-
-    7482d6f5f5.sigmoid_output_dict.dev_queries.pkl
-    7482d6f5f5.sigmoid_output_dict.dev_search.pkl
-    7482d6f5f5.word_to_id.pkl
-
-
-Example of loading dictionary:
-
-    import cPickle as pickle
-    fn = "18ba6618ad.sigmoid_final_feedforward_dict.dev_queries.pkl"
-    with open(fn, "rb") as f:
-        queries_dict = pickle.load()
-    print(queries_dict.keys()[0])
-    print(queries_dict[queries_dict.keys()[0]])
-
-
-
-Model notebook
---------------
-- OracleSpeechCNN: models/train_bow_cnn/4f8af91591
-- VisionSpeechCNN trained using vision system which includes Flickr8k dev
-  images (dea2850778): models/train_visionspeech_cnn/989f00f30a
-- VisionSpeechCNN trained using vision system not overlapping with any Flickr8k
-  images (bc22ca83c9): models/train_visionspeech_cnn/49b4c2e773
+On the test set, this model achieves the following scores, as in Tables 3 of
+[Kamper et al., TASLP'18](https://arxiv.org/abs/1710.01949) under
+VisionTagPrior:
+    
+    Exact keyword spotting:
+    Average P@10: 0.0284
+    Average P@N: 0.0342
+    Average EER: 0.5000
+    Average precision: 0.0522
+    Mean average precision: 0.0353
+    
+    Semantic keyword spotting:
+    Average P@10: 0.0612
+    Average P@N: 0.0696
+    Average EER: 0.5000
+    Average precision: 0.1110
+    Mean average precision: 0.0726
+    Spearman's rho: 0.1254
+    
+    Breakdown of exact and semantic matches
+    Average P@N: 0.0696
+    Average P@N* overall: 0.1206
+    Average P@N* exact: 0.0477
+    Average P@N* semantic: 0.0729

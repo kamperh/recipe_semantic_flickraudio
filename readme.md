@@ -8,7 +8,8 @@ speech, and using this model for semantic keyword spotting. The model and
 this new task are described in the following publications:
 
 - H. Kamper, G. Shakhnarovich, and K. Livescu, "Semantic keyword spotting by
-  learning from images and speech," *arXiv preprint arXiv:1710.01949*, 2017.
+  learning from images and speech," in press *IEEE/ACM Transactions on Audio,
+  Speech and Language Processing*, 2018.
   [[arXiv](https://arxiv.org/abs/1710.01949)]
 - H. Kamper, S. Settle, G. Shakhnarovich, and K. Livescu, "Visually grounded
   learning of keyword prediction from untranscribed speech," in *Proc.
@@ -17,7 +18,7 @@ this new task are described in the following publications:
 Please cite these papers if you use the code.
 
 A related [recipe](https://github.com/kamperh/recipe_vision_speech_flickr) is
-also available, but this one is the current up to date version.
+also available, but this one is most recent recipe.
 
 
 Disclaimer
@@ -34,8 +35,8 @@ The following datasets need to be obtained:
 
 - [Flickr audio](https://groups.csail.mit.edu/sls/downloads/flickraudio/)
 - [Flickr8k images](http://nlp.cs.illinois.edu/HockenmaierGroup/Framing_Image_Description/Flickr8k_Dataset.zip)
-- [Flickr8k text](http://nlp.cs.illinois.edu/HockenmaierGroup/Framing_Image_Description/Flickr8k_Dataset.zip)
-- [Flickr30k](http://shannon.cs.illinois.edu/DenotationGraph/)
+- [Flickr8k text](http://nlp.cs.illinois.edu/HockenmaierGroup/Framing_Image_Description/Flickr8k_text.zip)
+- [Flickr30k](http://web.engr.illinois.edu/~bplumme2/Flickr30kEntities/)
 - [MSCOCO](http://cocodataset.org/#download)
 
 MSCOCO and Flickr30k is used for training a vision tagging system. The Flickr8k
@@ -102,7 +103,7 @@ Repositories from GitHub:
 Contributors
 ------------
 - [Herman Kamper](http://www.kamperh.com/)
-- Shane Settle
+- [Shane Settle](https://github.com/shane-settle)
 - [Karen Livescu](http://ttic.uchicago.edu/~klivescu/)
 - [Greg Shakhnarovich](http://ttic.uchicago.edu/~gregory/)
 
