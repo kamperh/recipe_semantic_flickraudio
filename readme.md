@@ -8,8 +8,8 @@ speech, and using this model for semantic keyword spotting. The model and
 this new task are described in the following publications:
 
 - H. Kamper, G. Shakhnarovich, and K. Livescu, "Semantic speech retrieval with
-  a  visually grounded model of untranscribed speech,"  IEEE/ACM Transactions
-  on Audio, Speech and Language Processing, vol. 27, no. 1, pp. 89-98, 2019.
+  a  visually grounded model of untranscribed speech," *IEEE/ACM Transactions
+  on Audio, Speech and Language Processing*, vol. 27, no. 1, pp. 89-98, 2019.
   [[arXiv](https://arxiv.org/abs/1710.01949)]
 - H. Kamper, S. Settle, G. Shakhnarovich, and K. Livescu, "Visually grounded
   learning of keyword prediction from untranscribed speech," in *Proc.
